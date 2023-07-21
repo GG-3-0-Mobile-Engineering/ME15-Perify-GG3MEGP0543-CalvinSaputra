@@ -19,11 +19,15 @@ class MainViewModel : ViewModel() {
     val properties: LiveData<List<Properties>> = _properties
 
     init {
-        showDisasterReport(86400)
+        showDisasterReport()
     }
 
-    private fun showDisasterReport(timeperiod: Int) {
-        val client = ApiConfig.getApiService().getListArchived(timeperiod)
+    private fun showDisasterReport(
+        timeperiod: Int? = null,
+        admin: String? = null,
+        disaster: String? = null
+    ) {
+        val client = ApiConfig.getApiService().getDisasterReport(timeperiod, admin, disaster)
         client.enqueue(object : Callback<DisasterReportResponse> {
             override fun onResponse(
                 call: Call<DisasterReportResponse>,
@@ -42,7 +46,7 @@ class MainViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<DisasterReportResponse>, t: Throwable) {
-                when(t){
+                when (t) {
                     is SocketTimeoutException, is UnknownHostException -> {
                         Log.d("MainViewModel", "No Connection,")
                     }

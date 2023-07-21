@@ -29,8 +29,19 @@ class DisasterAdapter :
     class MyViewHolder(private val binding: ItemPerilBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(data: Properties) {
-            binding.tvDisasterName.text = data.title.toString()
-            binding.tvDisasterInformation.text = data.text ?: "No Text"
+            when (data.title) {
+                null -> binding.tvDisasterName.text =
+                    binding.root.context.getString(R.string.title_null)
+                else -> binding.tvDisasterName.text = data.title
+            }
+
+            when (data.text) {
+                binding.root.context.getString(R.string.empty_string) -> binding.tvDisasterInformation.text =
+                    binding.root.context.getString(R.string.information_null)
+                else -> binding.tvDisasterInformation.text = data.text
+            }
+
+            binding.tvDisasterLabel.text = data.disasterType
             Glide.with(binding.root.context)
                 .load(data.imageUrl ?: R.drawable.ic_launcher_background)
                 .into(binding.ivDisasaterPhoto)

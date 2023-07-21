@@ -2,9 +2,15 @@
     <string name="app_name">Perify</string>
 
     <!-- Item_peril-->
-    <string name="iperil_disaster_name">Disaster Name</string>
+    <string name="iperil_disaster_title">Disaster Title</string>
+    <string name="iperil_disaster_type">Type</string>
     <string name="iperil_disaster_info">Disaster information goes here</string>
     <string name="iperil_picture_description">Disaster Description</string>
+
+    <!-- Data handling message -->
+    <string name="information_null">No Description Available</string>
+    <string name="title_null">No Title</string>
+    <string name="empty_string"></string>
 
     <!-- Bottom_sheet-->
     <string name="bs_title">Current Disaster News</string>

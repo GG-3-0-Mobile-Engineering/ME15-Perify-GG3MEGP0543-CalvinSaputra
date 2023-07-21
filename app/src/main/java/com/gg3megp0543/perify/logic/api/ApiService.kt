@@ -7,7 +7,9 @@ import retrofit2.http.Query
 
 interface ApiService {
     @GET("reports")
-    fun getListArchived(
-        @Query("timeperiod") timeperiod: Int
+    fun getDisasterReport(
+        @Query("timeperiod") timeperiod: Int? = null,
+        @Query("admin") admin: String? = null,
+        @Query("disaster") disaster: String? = null
     ): Call<DisasterReportResponse>
 }

@@ -62,7 +62,7 @@ data class Properties(
 	val source: String? = null,
 
 	@field:SerializedName("title")
-	val title: Any? = null,
+	val title: String? = null,
 
 	@field:SerializedName("url")
 	val url: String? = null,
