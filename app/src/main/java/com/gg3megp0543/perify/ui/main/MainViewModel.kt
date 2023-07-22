@@ -1,15 +1,27 @@
 package com.gg3megp0543.perify.ui.main
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.gg3megp0543.perify.logic.common.ApiRes
 import com.gg3megp0543.perify.logic.data.DisasterRepository
+import com.gg3megp0543.perify.logic.di.Injection
 import com.gg3megp0543.perify.logic.model.Properties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainViewModel(private val disasterRepository: DisasterRepository) : ViewModel() {
+class MainViewModel private constructor(private val disasterRepository: DisasterRepository) :
+    ViewModel() {
+    companion object {
+        @Volatile
+        private var INSTANCE: MainViewModel? = null
+
+        fun getInstance(disasterRepository: DisasterRepository): MainViewModel {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: MainViewModel(disasterRepository).also { INSTANCE = it }
+            }
+        }
+    }
+
     private val _properties = MutableLiveData<List<Properties>>()
     val properties: LiveData<List<Properties>> = _properties
 
@@ -17,8 +29,7 @@ class MainViewModel(private val disasterRepository: DisasterRepository) : ViewMo
     val error: LiveData<Throwable> = _error
 
     init {
-        showDisasterReport(timeperiod = 86400)
-        Log.d("MVM", "showDisasterReport is called")
+        showDisasterReport(timeperiod = 86400, disaster = "flood")
     }
 
     fun showDisasterReport(
@@ -43,10 +54,12 @@ class MainViewModel(private val disasterRepository: DisasterRepository) : ViewMo
     }
 }
 
-class MainViewModelFactory(private val disasterRepository: DisasterRepository) : ViewModelProvider.Factory {
+@Suppress("UNCHECKED_CAST")
+class MainViewModelFactory() : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(disasterRepository) as T
+            val disasterRepository = Injection.provideDisasterRepository()
+            return MainViewModel.getInstance(disasterRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

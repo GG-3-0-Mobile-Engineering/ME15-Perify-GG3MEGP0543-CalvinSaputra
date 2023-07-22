@@ -34,4 +34,15 @@ class DisasterRepository(private val apiService: ApiService) {
             ApiRes.Error(t)
         }
     }
+
+    companion object {
+        @Volatile
+        private var instance: DisasterRepository? = null
+        fun getInstance(
+            apiService: ApiService,
+        ): DisasterRepository =
+            instance ?: synchronized(this) {
+                instance ?: DisasterRepository(apiService)
+            }.also { instance = it }
+    }
 }
