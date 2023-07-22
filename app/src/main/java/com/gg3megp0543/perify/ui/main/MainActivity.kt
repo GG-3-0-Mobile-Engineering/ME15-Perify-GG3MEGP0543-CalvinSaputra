@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gg3megp0543.perify.databinding.ActivityMainBinding
+import com.gg3megp0543.perify.logic.api.ApiConfig
+import com.gg3megp0543.perify.logic.data.DisasterRepository
 import com.gg3megp0543.perify.logic.model.Properties
 
 class MainActivity : AppCompatActivity() {
@@ -17,12 +19,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        val apiService = ApiConfig.getApiService()
+        val disasterRepository = DisasterRepository(apiService)
 
-        viewModel.properties.observe(this) {
-            it?.let { properties ->
-                setupAdapter(properties)
-            }
+        viewModel = ViewModelProvider(this, MainViewModelFactory(disasterRepository))[MainViewModel::class.java]
+
+        viewModel.properties.observe(this) { properties ->
+            properties?.let { setupAdapter(it) }
         }
 
         val layoutMan = LinearLayoutManager(this)
