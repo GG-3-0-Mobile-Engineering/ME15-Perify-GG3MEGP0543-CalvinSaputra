@@ -2,11 +2,13 @@ package com.gg3megp0543.perify.ui.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.databinding.ItemPerilBinding
+import com.gg3megp0543.perify.logic.helper.Utils
 import com.gg3megp0543.perify.logic.model.Properties
 
 class DisasterAdapter :
@@ -29,19 +31,26 @@ class DisasterAdapter :
     class MyViewHolder(private val binding: ItemPerilBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(data: Properties) {
-            when (data.title) {
-                null -> binding.tvDisasterName.text =
-                    binding.root.context.getString(R.string.title_null)
-                else -> binding.tvDisasterName.text = data.title
-            }
+            binding.tvDisasterName.text = Utils.getStringOrDefault(
+                data.title,
+                binding.root.context.getString(R.string.title_null)
+            )
 
-            when (data.text) {
-                binding.root.context.getString(R.string.empty_string) -> binding.tvDisasterInformation.text =
-                    binding.root.context.getString(R.string.information_null)
-                else -> binding.tvDisasterInformation.text = data.text
-            }
+            binding.tvDisasterInformation.text = Utils.getStringOrDefault(
+                data.text,
+                binding.root.context.getString(R.string.information_null),
+                binding.root.context.getString(R.string.empty_string)
+            )
 
             binding.tvDisasterLabel.text = data.disasterType
+
+            binding.disasterCard.setCardBackgroundColor(
+                ContextCompat.getColor(
+                    binding.root.context,
+                    Utils.setCardBackgroundColor(data.disasterType)
+                )
+            )
+
             Glide.with(binding.root.context)
                 .load(data.imageUrl ?: R.drawable.ic_launcher_background)
                 .into(binding.ivDisasaterPhoto)

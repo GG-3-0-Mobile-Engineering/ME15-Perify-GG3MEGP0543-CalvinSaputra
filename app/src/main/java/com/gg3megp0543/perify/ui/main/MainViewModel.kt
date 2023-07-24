@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.gg3megp0543.perify.logic.common.ApiRes
 import com.gg3megp0543.perify.logic.data.DisasterRepository
 import com.gg3megp0543.perify.logic.di.Injection
+import com.gg3megp0543.perify.logic.helper.Utils
 import com.gg3megp0543.perify.logic.model.Properties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +45,9 @@ class MainViewModel private constructor(private val disasterRepository: Disaster
                 }
 
                 when (result) {
-                    is ApiRes.Success -> _properties.value = result.data
+                    is ApiRes.Success -> {
+                        _properties.value = result.data
+                    }
                     is ApiRes.Error -> _error.value = result.throwable
                 }
             } catch (t: Throwable) {

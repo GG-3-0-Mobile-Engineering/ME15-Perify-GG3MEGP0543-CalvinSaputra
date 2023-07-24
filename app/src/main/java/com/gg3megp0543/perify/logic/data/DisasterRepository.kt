@@ -1,6 +1,5 @@
 package com.gg3megp0543.perify.logic.data
 
-import android.util.Log
 import com.gg3megp0543.perify.logic.api.ApiService
 import com.gg3megp0543.perify.logic.common.ApiRes
 import com.gg3megp0543.perify.logic.model.Properties
@@ -14,7 +13,6 @@ class DisasterRepository(private val apiService: ApiService) {
         disaster: String? = null
     ): ApiRes<List<Properties>> = withContext(Dispatchers.IO) {
         try {
-            Log.d("DisasterRepository", "getDisasterReport API call started")
             val response = apiService.getDisasterReport(timeperiod, admin, disaster)
 
             if (response.isSuccessful) {
