@@ -11,15 +11,22 @@ class DisasterRepository(private val apiService: ApiService) {
         timeperiod: Int? = null,
         admin: String? = null,
         disaster: String? = null
-    ): ApiRes<List<Properties>> = withContext(Dispatchers.IO) {
+    ): ApiRes<List<Pair<Properties, List<Any?>>>> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getDisasterReport(timeperiod, admin, disaster)
 
             if (response.isSuccessful) {
                 val responseData = response.body()
                 if (responseData != null) {
-                    val data = responseData.result?.objects?.output?.geometries?.mapNotNull {
-                        it?.properties
+                    val data = responseData.result?.objects?.output?.geometries?.mapNotNull { geometry ->
+                        geometry?.properties?.let { properties ->
+                            val coordinates = geometry.coordinates
+                            if (coordinates != null) {
+                                properties to coordinates
+                            } else {
+                                null
+                            }
+                        }
                     } ?: emptyList()
                     ApiRes.Success(data)
                 } else {

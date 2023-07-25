@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="@string/setting_header">
+        <ListPreference
+            app:defaultValue="@string/pref_dark_auto"
+            app:entries="@array/dark_mode"
+            app:entryValues="@array/dark_mode_value"
+            app:key="@string/pref_key_dark"
+            app:title="@string/pref_dark_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+</androidx.preference.PreferenceScreen>

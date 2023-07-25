@@ -16,6 +16,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -40,8 +41,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
 
-        viewModel.properties.observe(this) { properties ->
-            properties?.let {
+        viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
+            propertiesWithCoordinates?.let {
                 setData(it)
             }
         }
@@ -56,9 +57,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun setData(listProperties: List<Properties>) {
+    private fun setData(propertiesWithCoordinates: List<Pair<Properties, List<Any?>>>) {
         val adapter = DisasterAdapter()
-        adapter.submitList(listProperties)
+        adapter.submitList(propertiesWithCoordinates.map { it.first })
         binding.rvDisaster.adapter = adapter
     }
 
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         getMyLocation()
+        locationMarker()
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -95,30 +97,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-//    private fun locationMarker() {
-//        viewModel.properties.observe(this) { properties ->
-//            properties?.forEach { item ->
-//                val latLng = story.lat?.let { story.lon?.let { it1 -> LatLng(it, it1) } }
-//                val addressName = getAddressName(item)
-//                mMap.addMarker(
-//                    MarkerOptions().position(latLng!!).title(story.name).snippet(addressName)
-//                )
-//                boundsBuilder.include(latLng)
-//            }
-//
-//            if (properties.isNotEmpty()) {
-//                val bounds: LatLngBounds = boundsBuilder.build()
-//                mMap.animateCamera(
-//                    CameraUpdateFactory.newLatLngBounds(
-//                        bounds,
-//                        resources.displayMetrics.widthPixels,
-//                        resources.displayMetrics.heightPixels,
-//                        300
-//                    )
-//                )
-//            }
-//        }
-//    }
+    private fun locationMarker() {
+        viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
+            propertiesWithCoordinates?.forEach { (properties, coordinates) ->
+                if (coordinates.size >= 2) {
+                    val latLng = LatLng(coordinates[1] as Double, coordinates[0] as Double)
+                    val addressName =
+                        getAddressName(coordinates[1] as Double, coordinates[0] as Double)
+                    mMap.addMarker(
+                        MarkerOptions().position(latLng).title(properties.title)
+                            .snippet(addressName)
+                    )
+                    boundsBuilder.include(latLng)
+                }
+            }
+
+            if (propertiesWithCoordinates?.isNotEmpty() == true) {
+                val bounds: LatLngBounds = boundsBuilder.build()
+                mMap.animateCamera(
+                    CameraUpdateFactory.newLatLngBounds(
+                        bounds,
+                        resources.displayMetrics.widthPixels,
+                        resources.displayMetrics.heightPixels,
+                        300
+                    )
+                )
+            }
+        }
+    }
 
     @Suppress("DEPRECATION")
     private fun getAddressName(lat: Double, lon: Double): String? {

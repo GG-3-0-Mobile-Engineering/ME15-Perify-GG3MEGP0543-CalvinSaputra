@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.gg3megp0543.perify.logic.common.ApiRes
 import com.gg3megp0543.perify.logic.data.DisasterRepository
 import com.gg3megp0543.perify.logic.di.Injection
-import com.gg3megp0543.perify.logic.helper.Utils
 import com.gg3megp0543.perify.logic.model.Properties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,14 +22,14 @@ class MainViewModel private constructor(private val disasterRepository: Disaster
         }
     }
 
-    private val _properties = MutableLiveData<List<Properties>>()
-    val properties: LiveData<List<Properties>> = _properties
+    private val _propertiesWithCoordinates = MutableLiveData<List<Pair<Properties, List<Any?>>>>()
+    val propertiesWithCoordinates: LiveData<List<Pair<Properties, List<Any?>>>> = _propertiesWithCoordinates
 
     private val _error = MutableLiveData<Throwable>()
     val error: LiveData<Throwable> = _error
 
     init {
-        showDisasterReport(timeperiod = 86400, disaster = "flood")
+        showDisasterReport(timeperiod = 604800)
     }
 
     fun showDisasterReport(
@@ -46,7 +45,7 @@ class MainViewModel private constructor(private val disasterRepository: Disaster
 
                 when (result) {
                     is ApiRes.Success -> {
-                        _properties.value = result.data
+                        _propertiesWithCoordinates.value = result.data
                     }
                     is ApiRes.Error -> _error.value = result.throwable
                 }
@@ -58,7 +57,7 @@ class MainViewModel private constructor(private val disasterRepository: Disaster
 }
 
 @Suppress("UNCHECKED_CAST")
-class MainViewModelFactory() : ViewModelProvider.Factory {
+class MainViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             val disasterRepository = Injection.provideDisasterRepository()

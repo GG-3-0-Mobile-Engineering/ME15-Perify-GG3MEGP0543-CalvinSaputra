@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="104dp"
             android:text="@string/iperil_disaster_title"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnPrimaryContainer"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/tv_disaster_information"
@@ -49,7 +49,7 @@
             android:layout_marginTop="8dp"
             android:maxLines="3"
             android:text="@string/iperil_disaster_info"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnPrimaryContainer"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/iv_disasater_photo"
             app:layout_constraintStart_toEndOf="@id/iv_disasater_photo"
@@ -59,27 +59,30 @@
             android:id="@+id/disaster_card"
             android:layout_width="80dp"
             android:layout_height="20dp"
-            android:layout_marginBottom="15dp"
-            app:cardBackgroundColor="@color/teal_700"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="?attr/colorOnPrimaryContainer"
             app:cardCornerRadius="6dp"
             app:cardElevation="2dp"
             app:layout_constraintBottom_toTopOf="@+id/tv_disaster_information"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.954"
             app:layout_constraintStart_toEndOf="@+id/tv_disaster_name">
 
-            <TextView
-                android:id="@+id/tv_disaster_label"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingStart="8dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="8dp"
-                android:text="@string/iperil_disaster_type"
-                android:textAlignment="center"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:layout_gravity="center">
 
+                <TextView
+                    android:id="@+id/tv_disaster_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/iperil_disaster_type"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
