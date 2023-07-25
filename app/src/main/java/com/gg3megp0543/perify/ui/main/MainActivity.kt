@@ -4,6 +4,8 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -44,8 +46,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
             propertiesWithCoordinates?.let {
                 setData(it)
+                locationMarker()
             }
         }
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            viewModel.showDisasterReport(disaster = "haze", timeperiod = 86400)
+        }, 10000)
 
         binding.rvDisaster.layoutManager = LinearLayoutManager(this)
 
@@ -74,7 +81,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         getMyLocation()
-        locationMarker()
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -98,6 +104,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun locationMarker() {
+        mMap.clear()
+
         viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
             propertiesWithCoordinates?.forEach { (properties, coordinates) ->
                 if (coordinates.size >= 2) {
