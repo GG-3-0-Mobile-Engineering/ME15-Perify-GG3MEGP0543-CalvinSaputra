@@ -28,26 +28,47 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Give a relative layout! -->
+
         <SearchView
             android:id="@+id/sv_province"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:queryHint="Search for a province" />
+            android:layout_marginTop="48dp"
+            android:queryHint="@string/searchView_hint" />
 
-        <!--        <com.google.android.material.search.SearchBar-->
-        <!--            android:id="@+id/search_bar"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:hint="Search for something" />-->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cg_disasterType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="96dp">
 
-        <!--        <com.google.android.material.search.SearchView-->
-        <!--            android:id="@+id/search_view"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="match_parent"-->
-        <!--            android:hint="Search something"-->
-        <!--            app:layout_anchor="@id/search_bar">-->
-        <!--            &lt;!&ndash; Search suggestions/results go here (ScrollView, RecyclerView, etc.). &ndash;&gt;-->
-        <!--        </com.google.android.material.search.SearchView>-->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_haze"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorOnPrimary"
+                android:text="Haze" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_wind"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorOnPrimary"
+                android:text="Wind" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_flood"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorOnPrimary"
+                android:text="Flood" />
+
+        </com.google.android.material.chip.ChipGroup>
 
         <FrameLayout
             android:id="@+id/bottom_sheet"
@@ -71,7 +92,9 @@
                     android:id="@+id/rv_disaster"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/drag_handle" />
+                    android:layout_below="@id/drag_handle"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp" />
 
             </RelativeLayout>
         </FrameLayout>

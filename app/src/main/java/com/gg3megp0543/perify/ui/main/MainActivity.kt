@@ -8,12 +8,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.databinding.ActivityMainBinding
+import com.gg3megp0543.perify.logic.helper.ProvinceHelper
 import com.gg3megp0543.perify.logic.model.Properties
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -33,12 +35,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private val boundsBuilder = LatLngBounds.Builder()
     private lateinit var viewModel: MainViewModel
     private var isMapReady = false
-    private val cityMap = mapOf(
-        "Jakarta" to "ID-JK",
-        "Palembang" to "ID-PB",
-        "Yogyakrta" to "ID-YO"
-    )
-    private val suggestions = cityMap.keys.toList()
+    private val suggestions = ProvinceHelper.provinceMap.keys.toList()
+    private var selectedProvince: String? = null
+    private var selectedDisaster: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +50,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
 
-        val columns = arrayOf("_id", "city_name")
+        val columns = arrayOf("_id", "prov_name")
         val cursor = MatrixCursor(columns)
         suggestions.forEachIndexed { index, suggestion ->
             cursor.addRow(arrayOf(index, suggestion))
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             this,
             android.R.layout.simple_dropdown_item_1line,
             cursor,
-            arrayOf("city_name"),
+            arrayOf("prov_name"),
             intArrayOf(android.R.id.text1),
             0
         )
@@ -71,6 +70,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 binding.svProvince.clearFocus()
+
+                val provinceCode = ProvinceHelper.provinceMap[query?.capitalize()]
+                if (provinceCode != null) {
+                    selectedProvince = provinceCode
+                    viewModel.showDisasterReport(
+                        admin = selectedProvince,
+                        disaster = selectedDisaster
+                    )
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        R.string.unknown_province,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
                 return true
             }
 
@@ -96,15 +110,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
             override fun onSuggestionClick(position: Int): Boolean {
                 val cursor = adapter.getItem(position) as MatrixCursor
-                val selectedCity = cursor.getString(cursor.getColumnIndex("city_name"))
-                val cityCode = cityMap[selectedCity]
+                val selectedProv = cursor.getString(cursor.getColumnIndex("prov_name"))
+                val provCode = ProvinceHelper.provinceMap[selectedProv]
 
-                binding.svProvince.setQuery(selectedCity, true)
+                binding.svProvince.setQuery(selectedProv, true)
+                selectedProvince = provCode
 
-                viewModel.showDisasterReport(admin = cityCode)
+                viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
                 return true
             }
         })
+
+        binding.chipFlood.setOnClickListener {
+            selectedDisaster = "flood"
+            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
+        }
+
+        binding.chipHaze.setOnClickListener {
+            selectedDisaster = "haze"
+            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
+        }
 
         viewModel.loadingState.observe(this) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
@@ -140,10 +165,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         isMapReady = true
 
         mMap.let {
-            it.uiSettings.isZoomControlsEnabled = true
             it.uiSettings.isIndoorLevelPickerEnabled = true
             it.uiSettings.isCompassEnabled = true
-            it.uiSettings.isMapToolbarEnabled = true
         }
 
         getMyLocation()

@@ -11,6 +11,7 @@
     <string name="information_null">No Description Available</string>
     <string name="title_null">No Title</string>
     <string name="empty_string"></string>
+    <string name="unknown_province">Please enter a valid Province name</string>
 
     <!-- Bottom_sheet-->
     <string name="bs_title">Current Disaster News</string>
@@ -43,6 +44,6 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
-    <!-- Exception -->
-    <string name="viewModel_unknown">Unknown viewmodel class</string>
+    <!-- Activity Main -->
+    <string name="searchView_hint">Search for a Province</string>
 </resources>
