@@ -23,34 +23,44 @@ class MainViewModel private constructor(private val disasterRepository: Disaster
     }
 
     private val _propertiesWithCoordinates = MutableLiveData<List<Pair<Properties, List<Any?>>>>()
-    val propertiesWithCoordinates: LiveData<List<Pair<Properties, List<Any?>>>> = _propertiesWithCoordinates
+    val propertiesWithCoordinates: LiveData<List<Pair<Properties, List<Any?>>>> =
+        _propertiesWithCoordinates
+
+    private val _loadingState = MutableLiveData<Boolean>()
+    val loadingState: LiveData<Boolean> = _loadingState
 
     private val _error = MutableLiveData<Throwable>()
     val error: LiveData<Throwable> = _error
 
     init {
-        showDisasterReport(timeperiod = 604800)
+        showDisasterReport()
     }
 
     fun showDisasterReport(
-        timeperiod: Int? = null,
+        timeperiod: Int? = 604800,
         admin: String? = null,
         disaster: String? = null
     ) {
-        viewModelScope.launch {
-            try {
-                val result = withContext(Dispatchers.IO) {
-                    disasterRepository.getDisasterReport(timeperiod, admin, disaster)
-                }
+        if (_loadingState.value != true) {
+            viewModelScope.launch {
+                try {
+                    _loadingState.value = true
 
-                when (result) {
-                    is ApiRes.Success -> {
-                        _propertiesWithCoordinates.value = result.data
+                    val result = withContext(Dispatchers.IO) {
+                        disasterRepository.getDisasterReport(timeperiod, admin, disaster)
                     }
-                    is ApiRes.Error -> _error.value = result.throwable
+
+                    when (result) {
+                        is ApiRes.Success -> {
+                            _propertiesWithCoordinates.value = result.data
+                        }
+                        is ApiRes.Error -> _error.value = result.throwable
+                    }
+                } catch (t: Throwable) {
+                    _error.value = t
+                } finally {
+                    _loadingState.value = false
                 }
-            } catch (t: Throwable) {
-                _error.value = t
             }
         }
     }
@@ -66,3 +76,4 @@ class MainViewModelFactory : ViewModelProvider.Factory {
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
