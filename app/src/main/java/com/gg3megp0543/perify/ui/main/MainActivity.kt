@@ -71,7 +71,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 binding.svProvince.clearFocus()
 
-                val provinceCode = ProvinceHelper.provinceMap[query?.capitalize()]
+                val provinceCode = ProvinceHelper.provinceMap.entries.find { (province, _) ->
+                    province.equals(query, ignoreCase = true)
+                }?.value
+
                 if (provinceCode != null) {
                     selectedProvince = provinceCode
                     viewModel.showDisasterReport(
