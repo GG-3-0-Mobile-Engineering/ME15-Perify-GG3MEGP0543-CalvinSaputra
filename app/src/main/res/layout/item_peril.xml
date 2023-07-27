@@ -27,6 +27,20 @@
             tools:layout_editor_absoluteY="6dp" />
 
         <TextView
+            android:id="@+id/tv_disaster_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="28dp"
+            android:layout_marginTop="2dp"
+            android:text="@string/iperil_date"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/tv_disaster_information"
+            app:layout_constraintStart_toEndOf="@id/iv_disasater_photo"
+            app:layout_constraintTop_toBottomOf="@id/tv_disaster_name"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
             android:id="@+id/tv_disaster_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="28dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="14dp"
             android:maxLines="3"
             android:text="@string/iperil_disaster_info"
             android:textColor="?attr/colorOnSurface"
@@ -59,13 +73,13 @@
             android:id="@+id/disaster_card"
             android:layout_width="80dp"
             android:layout_height="20dp"
-            android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="?attr/colorOnPrimary"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="?attr/colorOnPrimaryContainer"
             app:cardCornerRadius="6dp"
             app:cardElevation="2dp"
             app:layout_constraintBottom_toTopOf="@+id/tv_disaster_information"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.954"
+            app:layout_constraintHorizontal_bias="0.818"
             app:layout_constraintStart_toEndOf="@+id/tv_disaster_name">
 
             <RelativeLayout

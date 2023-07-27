@@ -7,6 +7,7 @@
     <string name="iperil_disaster_info">Disaster information goes here</string>
     <string name="iperil_picture_description">Disaster Description</string>
     <string name="iperil_date">Date goes here</string>
+    <string name="iperil_date_location">%s | %s</string>
 
     <!-- Data handling message -->
     <string name="information_null">No Description Available</string>

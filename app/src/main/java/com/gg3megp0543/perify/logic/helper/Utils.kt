@@ -1,6 +1,8 @@
 package com.gg3megp0543.perify.logic.helper
 
 import com.gg3megp0543.perify.R
+import java.text.SimpleDateFormat
+import java.util.*
 
 object Utils {
     fun getStringOrDefault(
@@ -21,5 +23,15 @@ object Utils {
             DisasterEnum.WIND.disaster -> R.color.wind
             else -> R.color.flood
         }
+    }
+
+    fun dateFormatter(inputDate: String): String {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        val date: Date = inputFormat.parse(inputDate) ?: Date()
+        val outputFormat = SimpleDateFormat("MMM d, yyyy - HH:mm:ss", Locale.US)
+
+        return outputFormat.format(date)
     }
 }

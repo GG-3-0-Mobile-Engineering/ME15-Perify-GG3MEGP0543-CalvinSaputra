@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.databinding.ItemPerilBinding
+import com.gg3megp0543.perify.logic.helper.CodeProvinceHelper
 import com.gg3megp0543.perify.logic.helper.Utils
 import com.gg3megp0543.perify.logic.response.Properties
 
@@ -42,6 +43,11 @@ class DisasterAdapter :
                 binding.root.context.getString(R.string.empty_string)
             )
 
+            binding.tvDisasterDate.text = binding.root.context.getString(
+                R.string.iperil_date_location,
+                Utils.dateFormatter(data.createdAt.toString()),
+                CodeProvinceHelper.getLocationName(data.tags?.instanceRegionCode.toString())
+            )
             binding.tvDisasterLabel.text = data.disasterType
 
             binding.disasterCard.setCardBackgroundColor(

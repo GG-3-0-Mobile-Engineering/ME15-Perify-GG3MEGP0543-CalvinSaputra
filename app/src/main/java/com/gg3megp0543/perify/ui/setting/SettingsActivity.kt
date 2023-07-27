@@ -38,7 +38,6 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         private fun updateTheme(mode: Int): Boolean {
-            Log.d("SettingsFragment", "Setting dark mode to: $mode")
             AppCompatDelegate.setDefaultNightMode(mode)
             requireActivity().recreate()
             return true
