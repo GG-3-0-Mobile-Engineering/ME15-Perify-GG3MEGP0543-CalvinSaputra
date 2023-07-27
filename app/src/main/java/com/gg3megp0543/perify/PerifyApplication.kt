@@ -13,7 +13,7 @@ class PerifyApplication : Application() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         preferences.getString(
             getString(R.string.pref_key_dark),
-            getString(R.string.pref_dark_auto)
+            getString(R.string.pref_dark_follow_system)
         )?.apply {
             val mode = DarkModeEnum.valueOf(this.uppercase(Locale.US))
             AppCompatDelegate.setDefaultNightMode(mode.value)

@@ -1,5 +1,5 @@
-
 <resources>
+
     <style name="Theme.Perify" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
@@ -28,4 +28,19 @@
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
     </style>
+
+    <style name="Custom.BottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="marginLeftSystemWindowInsets">true</item>
+        <item name="marginRightSystemWindowInsets">true</item>
+        <item name="paddingBottomSystemWindowInsets">true</item>
+        <item name="paddingTopSystemWindowInsets">true</item>
+        <item name="paddingLeftSystemWindowInsets">false</item>
+        <item name="paddingRightSystemWindowInsets">false</item>
+        <item name="shapeAppearance">@macro/m3_comp_sheet_bottom_docked_container_shape</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Material3.Corner.Top
+        </item>
+        <item name="shouldRemoveExpandedCorners">false</item>
+        <item name="backgroundTint">?attr/colorOnPrimary</item>
+    </style>
+
 </resources>

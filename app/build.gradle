@@ -37,6 +37,9 @@ android {
 }
 
 dependencies {
+    // Worker
+    implementation "androidx.work:work-runtime-ktx:2.8.1"
+
     // Preference
     implementation "androidx.preference:preference-ktx:1.2.0"
 

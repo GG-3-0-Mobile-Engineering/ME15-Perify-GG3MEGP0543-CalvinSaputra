@@ -1,6 +1,8 @@
 package com.gg3megp0543.perify.ui.main
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.database.MatrixCursor
 import android.location.Geocoder
@@ -14,10 +16,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.databinding.ActivityMainBinding
 import com.gg3megp0543.perify.logic.helper.DisasterEnum
+import com.gg3megp0543.perify.logic.helper.KEY_DEPTH
+import com.gg3megp0543.perify.logic.helper.KEY_TITLE
 import com.gg3megp0543.perify.logic.helper.ProvinceHelper
+import com.gg3megp0543.perify.logic.notification.FloodNotificationWorker
 import com.gg3megp0543.perify.logic.response.Properties
 import com.gg3megp0543.perify.ui.setting.SettingsActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -41,6 +49,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private val suggestions = ProvinceHelper.provinceMap.keys.toList()
     private var selectedProvince: String? = null
     private var selectedDisaster: String? = null
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var notifViewModel: DummyNotificationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +62,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
+
+        sharedPreferences =
+            getSharedPreferences(getString(R.string.dummy_notif_pref), Context.MODE_PRIVATE)
+        notifViewModel = ViewModelProvider(this)[DummyNotificationViewModel::class.java]
+
+        if (!notifViewModel.isNotificationShown) {
+            showNotification()
+            notifViewModel.markNotificationAsShown()
+        }
 
         val columns = arrayOf("_id", "prov_name")
         val cursor = MatrixCursor(columns)
@@ -157,21 +176,31 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
         }
 
-        binding.ivSetting.setOnClickListener{
+        binding.ivSetting.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         viewModel.loadingState.observe(this) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.tvDisasterHeader.visibility = if (isLoading) View.GONE else View.VISIBLE
         }
 
         viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
             propertiesWithCoordinates?.let {
                 setData(it)
+
                 if (isMapReady) {
                     locationMarker()
                 }
             }
+        }
+
+        viewModel.error.observe(this) { errorMessage ->
+            Toast.makeText(
+                this@MainActivity,
+                errorMessage.message.toString(),
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         binding.rvDisaster.layoutManager = LinearLayoutManager(this)
@@ -184,10 +213,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun showNotification() {
+        val notificationWorkRequest =
+            OneTimeWorkRequest.Builder(FloodNotificationWorker::class.java)
+                .setInputData(
+                    workDataOf(
+                        KEY_TITLE to getString(R.string.dn_title),
+                        KEY_DEPTH to getString(R.string.dn_desc)
+                    )
+                )
+                .build()
+
+        WorkManager.getInstance(this).enqueue(notificationWorkRequest)
+    }
+
     private fun setData(propertiesWithCoordinates: List<Pair<Properties, List<Any?>>>) {
         val adapter = DisasterAdapter()
         adapter.submitList(propertiesWithCoordinates.map { it.first })
-        binding.rvDisaster.adapter = adapter
+
+        if (propertiesWithCoordinates.isNotEmpty()) {
+            binding.rvDisaster.visibility = View.VISIBLE
+            binding.tvEmptyData.visibility = View.GONE
+            binding.rvDisaster.adapter = adapter
+        } else {
+            binding.rvDisaster.visibility = View.GONE
+            binding.tvEmptyData.visibility = View.VISIBLE
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

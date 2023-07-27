@@ -1,6 +1,6 @@
 package com.gg3megp0543.perify.logic.helper
 
-enum class DisasterEnum(val disaster: String?){
+enum class DisasterEnum(val disaster: String?) {
     FLOOD("flood"),
     EARTHQUAKE("earthquake"),
     FIRE("fire"),

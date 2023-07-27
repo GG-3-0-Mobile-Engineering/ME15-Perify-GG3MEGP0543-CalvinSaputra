@@ -1,7 +1,7 @@
 package com.gg3megp0543.perify.logic.helper
 
 class ProvinceHelper {
-    companion object{
+    companion object {
         val provinceMap = mapOf(
             "Aceh" to "ID-AC",
             "Bali" to "ID-BA",

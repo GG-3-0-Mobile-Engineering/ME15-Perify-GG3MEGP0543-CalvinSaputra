@@ -39,7 +39,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="48dp"
-                android:queryHint="@string/searchView_hint" />
+                android:background="@drawable/outlined_search_view"
+                android:closeIcon="@null"
+                android:iconifiedByDefault="false"
+                android:queryBackground="@android:color/transparent"
+                android:queryHint="@string/searchView_hint"
+                app:closeIcon="@null" />
 
             <ImageView
                 android:id="@+id/iv_setting"
@@ -50,6 +55,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="12dp"
+                android:contentDescription="@string/condes_setting"
                 android:src="@drawable/ic_baseline_settings" />
 
             <HorizontalScrollView
@@ -118,7 +124,7 @@
 
         <FrameLayout
             android:id="@+id/bottom_sheet"
-            style="@style/Widget.Material3.BottomSheet"
+            style="@style/Custom.BottomSheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="16dp"
@@ -134,13 +140,38 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
+                <TextView
+                    android:id="@+id/tv_disaster_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/drag_handle"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/disaster_header"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_disaster"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/drag_handle"
+                    android:layout_below="@id/tv_disaster_header"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_empty_data"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_disaster_header"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/empty_data"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
             </RelativeLayout>
         </FrameLayout>

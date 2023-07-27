@@ -18,16 +18,17 @@ class DisasterRepository(private val apiService: ApiService) {
             if (response.isSuccessful) {
                 val responseData = response.body()
                 if (responseData != null) {
-                    val data = responseData.result?.objects?.output?.geometries?.mapNotNull { geometry ->
-                        geometry?.properties?.let { properties ->
-                            val coordinates = geometry.coordinates
-                            if (coordinates != null) {
-                                properties to coordinates
-                            } else {
-                                null
+                    val data =
+                        responseData.result?.objects?.output?.geometries?.mapNotNull { geometry ->
+                            geometry?.properties?.let { properties ->
+                                val coordinates = geometry.coordinates
+                                if (coordinates != null) {
+                                    properties to coordinates
+                                } else {
+                                    null
+                                }
                             }
-                        }
-                    } ?: emptyList()
+                        } ?: emptyList()
                     ApiRes.Success(data)
                 } else {
                     ApiRes.Error(Throwable("Response body is null"))

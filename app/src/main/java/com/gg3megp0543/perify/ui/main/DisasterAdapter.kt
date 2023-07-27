@@ -52,7 +52,7 @@ class DisasterAdapter :
             )
 
             Glide.with(binding.root.context)
-                .load(data.imageUrl ?: R.drawable.ic_launcher_background)
+                .load(data.imageUrl ?: R.drawable.empty_placeholder)
                 .into(binding.ivDisasaterPhoto)
         }
     }

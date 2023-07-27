@@ -37,7 +37,7 @@ class MainViewModel private constructor(private val disasterRepository: Disaster
     }
 
     fun showDisasterReport(
-        timeperiod: Int? = 604800,
+        timeperiod: Int? = 172800,
         admin: String? = null,
         disaster: String? = null
     ) {

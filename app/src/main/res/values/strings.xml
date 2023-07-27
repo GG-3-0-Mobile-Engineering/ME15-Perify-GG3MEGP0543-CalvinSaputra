@@ -6,12 +6,14 @@
     <string name="iperil_disaster_type">Type</string>
     <string name="iperil_disaster_info">Disaster information goes here</string>
     <string name="iperil_picture_description">Disaster Description</string>
+    <string name="iperil_date">Date goes here</string>
 
     <!-- Data handling message -->
     <string name="information_null">No Description Available</string>
     <string name="title_null">No Title</string>
     <string name="empty_string"></string>
     <string name="unknown_province">Please enter a valid Province name</string>
+    <string name="empty_data">Currently there\'s no disaster!</string>
 
     <!-- Bottom_sheet-->
     <string name="bs_title">Current Disaster News</string>
@@ -21,31 +23,19 @@
     <string name="setting_header">Setting</string>
     <string name="pref_dark_title">Dark mode</string>
     <string name="pref_key_dark" translatable="false">key_dark_mode</string>
-    <string name="pref_dark_auto" translatable="false">auto</string>
+    <string name="pref_dark_follow_system" translatable="false">follow_system</string>
     <string name="pref_dark_on" translatable="false">on</string>
     <string name="pref_dark_off" translatable="false">off</string>
     <string name="dark_mode_auto">Automatic</string>
     <string name="dark_mode_on">Dark mode</string>
     <string name="dark_mode_off">Light mode</string>
     <string name="title_activity_settings">SettingsActivity</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="dummy_notif_pref">Dummy Notification</string>
 
     <!-- Activity Main -->
     <string name="searchView_hint">Search for a Province</string>
+    <string name="condes_setting">Setting Button</string>
+    <string name="disaster_header">Current Disaster News</string>
 
     <!-- Disaster Type for Chips -->
     <string name="ds_flood">Flood</string>
@@ -54,4 +44,8 @@
     <string name="ds_haze">Haze</string>
     <string name="ds_wind">Wind</string>
     <string name="ds_volcano">Volcano</string>
+
+    <!-- Dummy Notification -->
+    <string name="dn_title">Informasi TMA Bendung Katulampa</string>
+    <string name="dn_desc">Bentung Katulampa memasuki SIAGA IV! Harap berhat-hati</string>
 </resources>
