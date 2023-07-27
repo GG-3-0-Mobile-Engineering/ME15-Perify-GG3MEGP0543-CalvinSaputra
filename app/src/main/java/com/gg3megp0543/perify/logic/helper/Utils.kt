@@ -23,12 +23,4 @@ object Utils {
             else -> R.color.flood
         }
     }
-
-    fun extractCoordinates(response: DisasterReportResponse?): List<Any?> {
-        return response?.result?.objects?.output?.geometries?.flatMap {
-            it?.coordinates ?: emptyList()
-        }
-            ?.filterNotNull()
-            .orEmpty()
-    }
 }

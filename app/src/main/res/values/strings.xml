@@ -46,4 +46,12 @@
 
     <!-- Activity Main -->
     <string name="searchView_hint">Search for a Province</string>
+
+    <!-- Disaster Type for Chips -->
+    <string name="ds_flood">Flood</string>
+    <string name="ds_earthquake">Earthquake</string>
+    <string name="ds_fire">Fire</string>
+    <string name="ds_haze">Haze</string>
+    <string name="ds_wind">Wind</string>
+    <string name="ds_volcano">Volcano</string>
 </resources>

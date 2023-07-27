@@ -28,47 +28,91 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Give a relative layout! -->
-
-        <SearchView
-            android:id="@+id/sv_province"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:queryHint="@string/searchView_hint" />
+            android:layout_height="wrap_content">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/cg_disasterType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="96dp">
+            <SearchView
+                android:id="@+id/sv_province"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:queryHint="@string/searchView_hint" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_haze"
-                style="@style/Widget.Material3.Chip.Assist"
+            <ImageView
+                android:id="@+id/iv_setting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?attr/colorOnPrimary"
-                android:text="Haze" />
+                android:src="@drawable/ic_baseline_settings"
+                android:layout_gravity="center_vertical"
+                android:layout_alignTop="@id/sv_province"
+                android:layout_alignBottom="@id/sv_province"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="12dp" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_wind"
-                style="@style/Widget.Material3.Chip.Assist"
-                android:layout_width="wrap_content"
+            <HorizontalScrollView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?attr/colorOnPrimary"
-                android:text="Wind" />
+                android:layout_below="@id/sv_province"
+                android:layout_marginStart="12dp"
+                android:scrollbars="none">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_flood"
-                style="@style/Widget.Material3.Chip.Assist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="?attr/colorOnPrimary"
-                android:text="Flood" />
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/cg_disasterType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-        </com.google.android.material.chip.ChipGroup>
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_flood"
+                        style="@style/Widget.Material3.Chip.Suggestion.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="?attr/colorOnPrimary"
+                        android:text="@string/ds_flood" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_earthquake"
+                        style="@style/Widget.Material3.Chip.Suggestion.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="?attr/colorOnPrimary"
+                        android:text="@string/ds_earthquake" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_fire"
+                        style="@style/Widget.Material3.Chip.Suggestion.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="?attr/colorOnPrimary"
+                        android:text="@string/ds_fire" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_haze"
+                        style="@style/Widget.Material3.Chip.Suggestion.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="?attr/colorOnPrimary"
+                        android:text="@string/ds_haze" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_wind"
+                        style="@style/Widget.Material3.Chip.Suggestion.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="?attr/colorOnPrimary"
+                        android:text="@string/ds_wind" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_volcano"
+                        style="@style/Widget.Material3.Chip.Suggestion.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="?attr/colorOnPrimary"
+                        android:text="@string/ds_volcano" />
+
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+        </RelativeLayout>
 
         <FrameLayout
             android:id="@+id/bottom_sheet"

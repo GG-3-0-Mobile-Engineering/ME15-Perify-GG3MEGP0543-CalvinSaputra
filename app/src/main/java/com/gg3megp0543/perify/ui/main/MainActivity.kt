@@ -1,5 +1,6 @@
 package com.gg3megp0543.perify.ui.main
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.MatrixCursor
 import android.location.Geocoder
@@ -15,8 +16,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.databinding.ActivityMainBinding
+import com.gg3megp0543.perify.logic.helper.DisasterEnum
 import com.gg3megp0543.perify.logic.helper.ProvinceHelper
 import com.gg3megp0543.perify.logic.model.Properties
+import com.gg3megp0543.perify.ui.setting.SettingsActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -125,13 +128,37 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         })
 
         binding.chipFlood.setOnClickListener {
-            selectedDisaster = "flood"
+            selectedDisaster = DisasterEnum.FLOOD.disaster
+            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
+        }
+
+        binding.chipEarthquake.setOnClickListener {
+            selectedDisaster = DisasterEnum.EARTHQUAKE.disaster
+            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
+        }
+
+        binding.chipFire.setOnClickListener {
+            selectedDisaster = DisasterEnum.FIRE.disaster
             viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
         }
 
         binding.chipHaze.setOnClickListener {
-            selectedDisaster = "haze"
+            selectedDisaster = DisasterEnum.HAZE.disaster
             viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
+        }
+
+        binding.chipWind.setOnClickListener {
+            selectedDisaster = DisasterEnum.WIND.disaster
+            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
+        }
+
+        binding.chipVolcano.setOnClickListener {
+            selectedDisaster = DisasterEnum.VOLCANO.disaster
+            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
+        }
+
+        binding.ivSetting.setOnClickListener{
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         viewModel.loadingState.observe(this) { isLoading ->
