@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import com.gg3megp0543.perify.logic.common.ApiRes
 import com.gg3megp0543.perify.logic.data.DisasterRepository
 import com.gg3megp0543.perify.logic.di.Injection
-import com.gg3megp0543.perify.logic.model.Properties
+import com.gg3megp0543.perify.logic.response.Properties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

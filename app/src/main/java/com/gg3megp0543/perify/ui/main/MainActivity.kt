@@ -18,7 +18,7 @@ import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.databinding.ActivityMainBinding
 import com.gg3megp0543.perify.logic.helper.DisasterEnum
 import com.gg3megp0543.perify.logic.helper.ProvinceHelper
-import com.gg3megp0543.perify.logic.model.Properties
+import com.gg3megp0543.perify.logic.response.Properties
 import com.gg3megp0543.perify.ui.setting.SettingsActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap

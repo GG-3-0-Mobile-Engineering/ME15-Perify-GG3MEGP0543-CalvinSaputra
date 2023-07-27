@@ -10,17 +10,19 @@
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:elevation="2dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/map" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="@id/coordinatorLayout"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -43,12 +45,12 @@
                 android:id="@+id/iv_setting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_settings"
-                android:layout_gravity="center_vertical"
                 android:layout_alignTop="@id/sv_province"
                 android:layout_alignBottom="@id/sv_province"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="12dp" />
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/ic_baseline_settings" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"

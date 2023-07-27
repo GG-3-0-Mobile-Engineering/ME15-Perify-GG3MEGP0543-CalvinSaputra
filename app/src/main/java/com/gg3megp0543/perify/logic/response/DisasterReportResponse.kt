@@ -1,4 +1,4 @@
-package com.gg3megp0543.perify.logic.model
+package com.gg3megp0543.perify.logic.response
 
 import com.google.gson.annotations.SerializedName
 

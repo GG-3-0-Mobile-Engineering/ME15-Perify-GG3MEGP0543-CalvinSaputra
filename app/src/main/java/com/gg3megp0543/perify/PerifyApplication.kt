@@ -6,7 +6,7 @@ import androidx.preference.PreferenceManager
 import com.gg3megp0543.perify.logic.helper.DarkModeEnum
 import java.util.*
 
-class Application: Application(){
+class PerifyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 

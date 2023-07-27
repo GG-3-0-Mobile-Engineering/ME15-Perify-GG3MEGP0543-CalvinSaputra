@@ -2,7 +2,7 @@ package com.gg3megp0543.perify.logic.data
 
 import com.gg3megp0543.perify.logic.api.ApiService
 import com.gg3megp0543.perify.logic.common.ApiRes
-import com.gg3megp0543.perify.logic.model.Properties
+import com.gg3megp0543.perify.logic.response.Properties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

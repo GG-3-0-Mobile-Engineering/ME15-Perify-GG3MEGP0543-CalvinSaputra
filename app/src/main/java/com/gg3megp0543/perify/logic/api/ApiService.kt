@@ -1,6 +1,6 @@
 package com.gg3megp0543.perify.logic.api
 
-import com.gg3megp0543.perify.logic.model.DisasterReportResponse
+import com.gg3megp0543.perify.logic.response.DisasterReportResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

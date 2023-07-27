@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.databinding.ItemPerilBinding
 import com.gg3megp0543.perify.logic.helper.Utils
-import com.gg3megp0543.perify.logic.model.Properties
+import com.gg3megp0543.perify.logic.response.Properties
 
 class DisasterAdapter :
     androidx.recyclerview.widget.ListAdapter<Properties, DisasterAdapter.MyViewHolder>(

@@ -1,7 +1,6 @@
 package com.gg3megp0543.perify.logic.helper
 
 import com.gg3megp0543.perify.R
-import com.gg3megp0543.perify.logic.model.DisasterReportResponse
 
 object Utils {
     fun getStringOrDefault(
