@@ -30,7 +30,7 @@ Perify (Peril Notify) is an Android app that provides information regarding a li
 
 [Perify.apk](https://drive.google.com/file/d/1OqnxiXGyu8vumbZeZyE17eNAalXUz2uV/view?usp=sharing)
 
-[Application Demo / Youtube](https://www.youtube.com/)
+[Application Demo / Youtube](https://youtu.be/SajvR25oEws)
 
 
 ## API Reference
