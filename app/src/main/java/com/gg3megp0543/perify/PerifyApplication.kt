@@ -3,7 +3,7 @@ package com.gg3megp0543.perify
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
-import com.gg3megp0543.perify.logic.helper.DarkModeEnum
+import com.gg3megp0543.perify.core.utils.DarkModeEnum
 import java.util.*
 
 class PerifyApplication : Application() {
