@@ -37,6 +37,9 @@ android {
 }
 
 dependencies {
+    // Room Database
+    implementation "androidx.room:room-runtime:2.5.2"
+
     // Worker
     implementation "androidx.work:work-runtime-ktx:2.8.1"
 
