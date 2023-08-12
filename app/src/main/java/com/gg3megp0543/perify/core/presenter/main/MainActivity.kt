@@ -8,6 +8,7 @@ import android.database.MatrixCursor
 import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.SearchView
@@ -20,14 +21,16 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.gg3megp0543.perify.R
+import com.gg3megp0543.perify.core.data.Resource
 import com.gg3megp0543.perify.databinding.ActivityMainBinding
 import com.gg3megp0543.perify.core.utils.DisasterEnum
 import com.gg3megp0543.perify.core.utils.KEY_DEPTH
 import com.gg3megp0543.perify.core.utils.KEY_TITLE
 import com.gg3megp0543.perify.core.utils.ProvinceHelper
 import com.gg3megp0543.perify.notification.FloodNotificationWorker
-import com.gg3megp0543.perify.core.data.source.remote.response.Properties
 import com.gg3megp0543.perify.core.presenter.setting.SettingsActivity
+import com.gg3megp0543.perify.core.ui.DisasterAdapter
+import com.gg3megp0543.perify.core.ui.ViewModelFactory
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var selectedDisaster: String? = null
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var notifViewModel: DummyNotificationViewModel
+    private lateinit var disasterAdapter: DisasterAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,16 +65,45 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
+        val factory = ViewModelFactory.getInstance(this)
+        viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
 
-        sharedPreferences =
-            getSharedPreferences(getString(R.string.dummy_notif_pref), Context.MODE_PRIVATE)
-        notifViewModel = ViewModelProvider(this)[DummyNotificationViewModel::class.java]
+//        sharedPreferences =
+//            getSharedPreferences(getString(R.string.dummy_notif_pref), Context.MODE_PRIVATE)
+//        notifViewModel = ViewModelProvider(this)[DummyNotificationViewModel::class.java]
+//
+//        if (!notifViewModel.isNotificationShown) {
+//            showNotification()
+//            notifViewModel.markNotificationAsShown()
+//        }
 
-        if (!notifViewModel.isNotificationShown) {
-            showNotification()
-            notifViewModel.markNotificationAsShown()
+        disasterAdapter = DisasterAdapter()
+
+        with(binding.rvDisaster) {
+            layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+            adapter = disasterAdapter
         }
+
+        viewModel.getAllDisaster(location = selectedProvince, disaster = selectedDisaster)
+            .observe(this) { disaster ->
+                Log.d("cekaku", disaster.data.toString())
+                if (disaster != null) {
+                    when (disaster) {
+                        is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
+                        is Resource.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            disasterAdapter.setData(disaster.data)
+                        }
+
+                        is Resource.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(this, "Error kocak!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
 
         val columns = arrayOf("_id", "prov_name")
         val cursor = MatrixCursor(columns)
@@ -88,44 +121,44 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         )
         binding.svProvince.suggestionsAdapter = adapter
 
-        binding.svProvince.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
-            androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                binding.svProvince.clearFocus()
-
-                val provinceCode = ProvinceHelper.provinceMap.entries.find { (province, _) ->
-                    province.equals(query, ignoreCase = true)
-                }?.value
-
-                if (provinceCode != null) {
-                    selectedProvince = provinceCode
-                    viewModel.showDisasterReport(
-                        admin = selectedProvince,
-                        disaster = selectedDisaster
-                    )
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        R.string.unknown_province,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let {
-                    val filteredCursor = MatrixCursor(columns)
-                    suggestions.forEachIndexed { index, suggestion ->
-                        if (suggestion.contains(newText, ignoreCase = true)) {
-                            filteredCursor.addRow(arrayOf(index, suggestion))
-                        }
-                    }
-                    adapter.changeCursor(filteredCursor)
-                }
-                return true
-            }
-        })
+//        binding.svProvince.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+//            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+//            override fun onQueryTextSubmit(query: String?): Boolean {
+//                binding.svProvince.clearFocus()
+//
+//                val provinceCode = ProvinceHelper.provinceMap.entries.find { (province, _) ->
+//                    province.equals(query, ignoreCase = true)
+//                }?.value
+//
+//                if (provinceCode != null) {
+//                    selectedProvince = provinceCode
+//                    viewModel.showDisasterReport(
+//                        admin = selectedProvince,
+//                        disaster = selectedDisaster
+//                    )
+//                } else {
+//                    Toast.makeText(
+//                        this@MainActivity,
+//                        R.string.unknown_province,
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//                return true
+//            }
+//
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                newText?.let {
+//                    val filteredCursor = MatrixCursor(columns)
+//                    suggestions.forEachIndexed { index, suggestion ->
+//                        if (suggestion.contains(newText, ignoreCase = true)) {
+//                            filteredCursor.addRow(arrayOf(index, suggestion))
+//                        }
+//                    }
+//                    adapter.changeCursor(filteredCursor)
+//                }
+//                return true
+//            }
+//        })
 
         binding.svProvince.setOnSuggestionListener(object : SearchView.OnSuggestionListener,
             androidx.appcompat.widget.SearchView.OnSuggestionListener {
@@ -141,67 +174,48 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 binding.svProvince.setQuery(selectedProv, true)
                 selectedProvince = provCode
 
-                viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
                 return true
             }
         })
 
         binding.chipFlood.setOnClickListener {
             selectedDisaster = DisasterEnum.FLOOD.disaster
-            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
         }
 
         binding.chipEarthquake.setOnClickListener {
             selectedDisaster = DisasterEnum.EARTHQUAKE.disaster
-            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
         }
 
         binding.chipFire.setOnClickListener {
             selectedDisaster = DisasterEnum.FIRE.disaster
-            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
         }
 
         binding.chipHaze.setOnClickListener {
             selectedDisaster = DisasterEnum.HAZE.disaster
-            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
         }
 
         binding.chipWind.setOnClickListener {
             selectedDisaster = DisasterEnum.WIND.disaster
-            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
         }
 
         binding.chipVolcano.setOnClickListener {
             selectedDisaster = DisasterEnum.VOLCANO.disaster
-            viewModel.showDisasterReport(admin = selectedProvince, disaster = selectedDisaster)
         }
 
         binding.ivSetting.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        viewModel.loadingState.observe(this) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-            binding.tvDisasterHeader.visibility = if (isLoading) View.GONE else View.VISIBLE
-        }
 
-        viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
-            propertiesWithCoordinates?.let {
-                setData(it)
-
-                if (isMapReady) {
-                    locationMarker()
-                }
-            }
-        }
-
-        viewModel.error.observe(this) { errorMessage ->
-            Toast.makeText(
-                this@MainActivity,
-                errorMessage.message.toString(),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+//        viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
+//            propertiesWithCoordinates?.let {
+//                setData(it)
+//
+//                if (isMapReady) {
+//                    locationMarker()
+//                }
+//            }
+//        }
 
         binding.rvDisaster.layoutManager = LinearLayoutManager(this)
 
@@ -227,19 +241,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         WorkManager.getInstance(this).enqueue(notificationWorkRequest)
     }
 
-    private fun setData(propertiesWithCoordinates: List<Pair<Properties, List<Any?>>>) {
-        val adapter = DisasterAdapter()
-        adapter.submitList(propertiesWithCoordinates.map { it.first })
-
-        if (propertiesWithCoordinates.isNotEmpty()) {
-            binding.rvDisaster.visibility = View.VISIBLE
-            binding.tvEmptyData.visibility = View.GONE
-            binding.rvDisaster.adapter = adapter
-        } else {
-            binding.rvDisaster.visibility = View.GONE
-            binding.tvEmptyData.visibility = View.VISIBLE
-        }
-    }
+//    private fun setData(propertiesWithCoordinates: List<Pair<Properties, List<Any?>>>) {
+//        val adapter = DisasterAdapter()
+//        adapter.submitList(propertiesWithCoordinates.map { it.first })
+//
+//        if (propertiesWithCoordinates.isNotEmpty()) {
+//            binding.rvDisaster.visibility = View.VISIBLE
+//            binding.tvEmptyData.visibility = View.GONE
+//            binding.rvDisaster.adapter = adapter
+//        } else {
+//            binding.rvDisaster.visibility = View.GONE
+//            binding.tvEmptyData.visibility = View.VISIBLE
+//        }
+//    }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -250,73 +264,73 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             it.uiSettings.isCompassEnabled = true
         }
 
-        getMyLocation()
-        locationMarker()
+//        getMyLocation()
+//        locationMarker()
     }
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { permitted: Boolean ->
-        if (permitted) {
-            getMyLocation()
-        }
-    }
-
-    private fun getMyLocation() {
-        if (ContextCompat.checkSelfPermission(
-                this.applicationContext,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            mMap.isMyLocationEnabled = true
-        } else {
-            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
-
-    private fun locationMarker() {
-        mMap.clear()
-
-        viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
-            propertiesWithCoordinates?.forEach { (properties, coordinates) ->
-                if (coordinates.size >= 2) {
-                    val latLng = LatLng(coordinates[1] as Double, coordinates[0] as Double)
-                    val addressName =
-                        getAddressName(coordinates[1] as Double, coordinates[0] as Double)
-                    mMap.addMarker(
-                        MarkerOptions().position(latLng).title(properties.disasterType)
-                            .snippet(addressName)
-                    )
-                    boundsBuilder.include(latLng)
-                }
-            }
-
-            if (propertiesWithCoordinates?.isNotEmpty() == true) {
-                val bounds: LatLngBounds = boundsBuilder.build()
-                mMap.animateCamera(
-                    CameraUpdateFactory.newLatLngBounds(
-                        bounds,
-                        resources.displayMetrics.widthPixels,
-                        resources.displayMetrics.heightPixels,
-                        300
-                    )
-                )
-            }
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun getAddressName(lat: Double, lon: Double): String? {
-        var addressName: String? = null
-        val geocoder = Geocoder(this@MainActivity, Locale.getDefault())
-        try {
-            val list = geocoder.getFromLocation(lat, lon, 1)
-            if (list != null && list.size != 0) {
-                addressName = list[0].getAddressLine(0)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return addressName
-    }
+//
+//    private val requestPermissionLauncher = registerForActivityResult(
+//        ActivityResultContracts.RequestPermission()
+//    ) { permitted: Boolean ->
+//        if (permitted) {
+//            getMyLocation()
+//        }
+//    }
+//
+//    private fun getMyLocation() {
+//        if (ContextCompat.checkSelfPermission(
+//                this.applicationContext,
+//                android.Manifest.permission.ACCESS_FINE_LOCATION
+//            ) == PackageManager.PERMISSION_GRANTED
+//        ) {
+//            mMap.isMyLocationEnabled = true
+//        } else {
+//            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+//        }
+//    }
+//
+//    private fun locationMarker() {
+//        mMap.clear()
+//
+//        viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
+//            propertiesWithCoordinates?.forEach { (properties, coordinates) ->
+//                if (coordinates.size >= 2) {
+//                    val latLng = LatLng(coordinates[1] as Double, coordinates[0] as Double)
+//                    val addressName =
+//                        getAddressName(coordinates[1] as Double, coordinates[0] as Double)
+//                    mMap.addMarker(
+//                        MarkerOptions().position(latLng).title(properties.disasterType)
+//                            .snippet(addressName)
+//                    )
+//                    boundsBuilder.include(latLng)
+//                }
+//            }
+//
+//            if (propertiesWithCoordinates?.isNotEmpty() == true) {
+//                val bounds: LatLngBounds = boundsBuilder.build()
+//                mMap.animateCamera(
+//                    CameraUpdateFactory.newLatLngBounds(
+//                        bounds,
+//                        resources.displayMetrics.widthPixels,
+//                        resources.displayMetrics.heightPixels,
+//                        300
+//                    )
+//                )
+//            }
+//        }
+//    }
+//
+//    @Suppress("DEPRECATION")
+//    private fun getAddressName(lat: Double, lon: Double): String? {
+//        var addressName: String? = null
+//        val geocoder = Geocoder(this@MainActivity, Locale.getDefault())
+//        try {
+//            val list = geocoder.getFromLocation(lat, lon, 1)
+//            if (list != null && list.size != 0) {
+//                addressName = list[0].getAddressLine(0)
+//            }
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//        }
+//        return addressName
+//    }
 }

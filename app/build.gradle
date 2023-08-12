@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id "org.jetbrains.kotlin.kapt"
 }
 
 android {
@@ -37,8 +38,15 @@ android {
 }
 
 dependencies {
+    // Coroutine
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
+    implementation "androidx.room:room-ktx:2.5.2"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+
     // Room Database
     implementation "androidx.room:room-runtime:2.5.2"
+    kapt "androidx.room:room-compiler:2.5.2"
 
     // Worker
     implementation "androidx.work:work-runtime-ktx:2.8.1"

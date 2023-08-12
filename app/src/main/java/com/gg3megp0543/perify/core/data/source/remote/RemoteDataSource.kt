@@ -1,15 +1,16 @@
 package com.gg3megp0543.perify.core.data.source.remote
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import com.gg3megp0543.perify.core.data.source.remote.network.ApiResponse
 import com.gg3megp0543.perify.core.data.source.remote.network.ApiService
-import com.gg3megp0543.perify.core.data.source.remote.response.DisasterReportResponse
-import com.gg3megp0543.perify.core.data.source.remote.response.Properties
+import com.gg3megp0543.perify.core.data.source.remote.response.GeometriesItem
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class RemoteDataSource private constructor(private val apiService: ApiService) {
+
     companion object {
         @Volatile
         private var instance: RemoteDataSource? = null
@@ -20,42 +21,25 @@ class RemoteDataSource private constructor(private val apiService: ApiService) {
             }
     }
 
-    fun getAllDisaster(): LiveData<ApiResponse<List<DisasterReportResponse>>> {
-        val resultData = MutableLiveData<ApiResponse<List<DisasterReportResponse>>>()
-
-        suspend fun getDisasterReport(
-            timeperiod: Int? = null,
-            admin: String? = null,
-            disaster: String? = null
-        ): ApiResponse<List<Pair<Properties, List<Any?>>>> = withContext(Dispatchers.IO) {
+    suspend fun getAllDisaster(
+        admin: String?,
+        disaster: String?
+    ): Flow<ApiResponse<List<GeometriesItem?>>> {
+        return flow {
             try {
-                val response = apiService.getDisasterReport(timeperiod, admin, disaster)
-
-                if (response.isSuccessful) {
-                    val responseData = response.body()
-                    if (responseData != null) {
-                        val data =
-                            responseData.result?.objects?.output?.geometries?.mapNotNull { geometry ->
-                                geometry?.properties?.let { properties ->
-                                    val coordinates = geometry.coordinates
-                                    if (coordinates != null) {
-                                        properties to coordinates
-                                    } else {
-                                        null
-                                    }
-                                }
-                            } ?: emptyList()
-                        ApiResponse.Success(data)
+                val response = apiService.getDisasterReport(admin = admin, disaster = disaster)
+                val dataArray = response.result?.objects?.output?.geometries
+                if (dataArray != null) {
+                    if (dataArray.isNotEmpty()) {
+                        emit(ApiResponse.Success(response.result?.objects?.output?.geometries))
                     } else {
-                        ApiResponse.Error("Response body is null")
+                        emit(ApiResponse.Empty)
                     }
-                } else {
-                    ApiResponse.Error("API call failed with code ${response.code()}")
                 }
-            } catch (t: Throwable) {
-                ApiResponse.Error(t.toString())
+            } catch (e: Exception) {
+                emit(ApiResponse.Error(e.toString()))
+                Log.e("RemoteDataSource", e.toString())
             }
-        }
-        return resultData
+        }.flowOn(Dispatchers.IO)
     }
 }

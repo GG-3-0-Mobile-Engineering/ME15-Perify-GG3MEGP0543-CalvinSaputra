@@ -1,22 +1,23 @@
 package com.gg3megp0543.perify.core.utils
 
 import com.gg3megp0543.perify.core.data.source.local.entity.DisasterEntity
-import com.gg3megp0543.perify.core.data.source.remote.response.PropertiesResponse
+import com.gg3megp0543.perify.core.data.source.remote.response.GeometriesItem
 import com.gg3megp0543.perify.core.domain.model.Disaster
 
 object DataMapper {
-    fun mapResponseToEntities(input: List<PropertiesResponse>): List<DisasterEntity> {
+    fun mapResponseToEntities(input: List<GeometriesItem?>): List<DisasterEntity> {
         val disasterList = ArrayList<DisasterEntity>()
         input.map {
             val disaster = DisasterEntity(
-                pkey = it.pkey,
-                imageUrl = it.imageUrl,
-                disasterType = it.disasterType,
-                tags = it.tags,
-                createdAt = it.createdAt,
-                title = it.title,
-                text = it.text,
-                coordinates = it.coordinates
+                pkey = it?.properties?.pkey.orEmpty(),
+                imageUrl = it?.properties?.imageUrl.toString(),
+                disasterType = it?.properties?.disasterType,
+                location = it?.properties?.tags?.instanceRegionCode,
+                createdAt = it?.properties?.createdAt,
+                title = it?.properties?.title,
+                text = it?.properties?.text,
+                latitude = it?.coordinates?.get(1) ?: 0.0,
+                longitude = it?.coordinates?.get(0) ?: 0.0
             )
             disasterList.add(disaster)
         }
@@ -29,22 +30,12 @@ object DataMapper {
                 pkey = it.pkey,
                 imageUrl = it.imageUrl,
                 disasterType = it.disasterType,
-                tags = it.tags,
+                latitude = it.latitude,
+                longitude = it.longitude,
                 createdAt = it.createdAt,
                 title = it.title,
                 text = it.text,
-                coordinates = it.coordinates
+                location = it.location
             )
         }
-
-    fun mapDomainToEntity(input: Disaster) = DisasterEntity(
-        pkey = input.pkey,
-        imageUrl = input.imageUrl,
-        disasterType = input.disasterType,
-        tags = input.tags,
-        createdAt = input.createdAt,
-        title = input.title,
-        text = input.text,
-        coordinates = input.coordinates
-    )
 }

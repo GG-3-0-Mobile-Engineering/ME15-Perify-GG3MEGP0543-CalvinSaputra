@@ -1,16 +1,17 @@
 package com.gg3megp0543.perify.core.data.source.local.room
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.gg3megp0543.perify.core.data.source.local.entity.DisasterEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DisasterDao {
-    @Query("SELECT * FROM disaster")
-    fun getAllDisaster(): LiveData<List<DisasterEntity>>
-
-    // TODO 1 (Add the insance region code too, use AND for the query!)
-    @Query("SELECT * FROM disaster WHERE disaster_type = :disasterType")
-    fun getDisasterBasedOnTypeAndLocation(disasterType: String): LiveData<List<DisasterEntity>>
+    @Query("SELECT * FROM disaster WHERE (:location IS NULL OR :location = :location) AND (:disasterType IS NULL OR disaster_type = :disasterType)")
+    fun getAllDisaster(location: String?, disasterType: String?): Flow<List<DisasterEntity>>
+e
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDisaster(disaster: List<DisasterEntity>)
 }

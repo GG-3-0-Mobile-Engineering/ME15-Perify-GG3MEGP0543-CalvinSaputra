@@ -3,21 +3,21 @@ package com.gg3megp0543.perify.core.data.source.local.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.gg3megp0543.perify.core.data.source.remote.response.Tags
+
 @Entity(tableName = "disaster")
 data class DisasterEntity(
     @PrimaryKey
     @ColumnInfo(name = "pkey")
-    var pkey: String? = null,
+    var pkey: String,
 
     @ColumnInfo(name = "image_url")
-    var imageUrl: Any? = null,
+    var imageUrl: String? = null,
 
     @ColumnInfo(name = "disaster_type")
     var disasterType: String? = null,
 
-    @ColumnInfo(name = "tags")
-    var tags: Tags? = null,
+    @ColumnInfo(name = "location")
+    var location: String? = null,
 
     @ColumnInfo(name = "created_at")
     var createdAt: String? = null,
@@ -28,6 +28,9 @@ data class DisasterEntity(
     @ColumnInfo(name = "text")
     var text: String? = null,
 
-    @ColumnInfo(name = "coordinates")
-    var coordinates: List<Any?>? = null
+    @ColumnInfo(name = "latidute")
+    var latitude: Double = 0.0,
+
+    @ColumnInfo(name = "longitude")
+    val longitude: Double = 0.0
 )

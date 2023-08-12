@@ -1,37 +1,48 @@
-package com.gg3megp0543.perify.core.presenter.main
+package com.gg3megp0543.perify.core.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.gg3megp0543.perify.R
+import com.gg3megp0543.perify.core.domain.model.Disaster
 import com.gg3megp0543.perify.databinding.ItemPerilBinding
 import com.gg3megp0543.perify.core.utils.CodeProvinceHelper
 import com.gg3megp0543.perify.core.utils.Utils
-import com.gg3megp0543.perify.core.data.source.remote.response.Properties
 
 class DisasterAdapter :
-    androidx.recyclerview.widget.ListAdapter<Properties, DisasterAdapter.MyViewHolder>(
+    androidx.recyclerview.widget.ListAdapter<Disaster, DisasterAdapter.MyViewHolder>(
         DIFF_CALLBACK
     ) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val binding = ItemPerilBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return MyViewHolder(binding)
+    private var listData = ArrayList<Disaster>()
+
+    fun setData(newListData: List<Disaster>?) {
+        if (newListData == null) return
+        listData.clear()
+        listData.addAll(newListData)
+        notifyDataSetChanged()
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder =
+        MyViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_peril, parent, false)
+        )
+
+    override fun getItemCount() = listData.size
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val data = getItem(position)
-        if (data != null) {
-            holder.bind(data)
-        }
+        val data = listData[position]
+        holder.bind(data)
     }
 
-    class MyViewHolder(private val binding: ItemPerilBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(data: Properties) {
+    inner class MyViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
+        private val binding = ItemPerilBinding.bind(itemView)
+        fun bind(data: Disaster) {
             binding.tvDisasterName.text = Utils.getStringOrDefault(
                 data.title,
                 binding.root.context.getString(R.string.title_null)
@@ -46,7 +57,7 @@ class DisasterAdapter :
             binding.tvDisasterDate.text = binding.root.context.getString(
                 R.string.iperil_date_location,
                 Utils.dateFormatter(data.createdAt.toString()),
-                CodeProvinceHelper.getLocationName(data.tags?.instanceRegionCode.toString())
+                data.location?.let { CodeProvinceHelper.getLocationName(it) }
             )
             binding.tvDisasterLabel.text = data.disasterType
 
@@ -64,17 +75,17 @@ class DisasterAdapter :
     }
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Properties>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Disaster>() {
             override fun areItemsTheSame(
-                oldItem: Properties,
-                newItem: Properties
+                oldItem: Disaster,
+                newItem: Disaster
             ): Boolean {
                 return oldItem == newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: Properties,
-                newItem: Properties
+                oldItem: Disaster,
+                newItem: Disaster
             ): Boolean {
                 return oldItem.pkey == newItem.pkey
             }

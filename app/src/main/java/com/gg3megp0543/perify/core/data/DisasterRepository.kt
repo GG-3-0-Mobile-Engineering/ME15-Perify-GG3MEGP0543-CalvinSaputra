@@ -1,53 +1,51 @@
 package com.gg3megp0543.perify.core.data
 
-import com.gg3megp0543.perify.core.data.source.remote.network.ApiService
-import com.gg3megp0543.perify.core.data.source.remote.response.Properties
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.gg3megp0543.perify.core.data.source.local.LocalDataSource
+import com.gg3megp0543.perify.core.data.source.remote.RemoteDataSource
+import com.gg3megp0543.perify.core.data.source.remote.network.ApiResponse
+import com.gg3megp0543.perify.core.data.source.remote.response.GeometriesItem
+import com.gg3megp0543.perify.core.domain.model.Disaster
+import com.gg3megp0543.perify.core.domain.repository.IDisasterRepository
+import com.gg3megp0543.perify.core.utils.DataMapper
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class DisasterRepository(private val apiService: ApiService) {
-    suspend fun getDisasterReport(
-        timeperiod: Int? = null,
-        admin: String? = null,
-        disaster: String? = null
-    ): ApiRes<List<Pair<Properties, List<Any?>>>> = withContext(Dispatchers.IO) {
-        try {
-            val response = apiService.getDisasterReport(timeperiod, admin, disaster)
-
-            if (response.isSuccessful) {
-                val responseData = response.body()
-                if (responseData != null) {
-                    val data =
-                        responseData.result?.objects?.output?.geometries?.mapNotNull { geometry ->
-                            geometry?.properties?.let { properties ->
-                                val coordinates = geometry.coordinates
-                                if (coordinates != null) {
-                                    properties to coordinates
-                                } else {
-                                    null
-                                }
-                            }
-                        } ?: emptyList()
-                    ApiRes.Success(data)
-                } else {
-                    ApiRes.Error(Throwable("Response body is null"))
-                }
-            } else {
-                ApiRes.Error(Throwable("API call failed with code ${response.code()}"))
-            }
-        } catch (t: Throwable) {
-            ApiRes.Error(t)
-        }
-    }
+class DisasterRepository(
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource,
+) : IDisasterRepository {
 
     companion object {
         @Volatile
         private var instance: DisasterRepository? = null
         fun getInstance(
-            apiService: ApiService,
+            remoteData: RemoteDataSource,
+            localData: LocalDataSource,
         ): DisasterRepository =
             instance ?: synchronized(this) {
-                instance ?: DisasterRepository(apiService)
-            }.also { instance = it }
+                instance ?: DisasterRepository(remoteData, localData)
+            }
     }
+
+    override fun getAllDisaster(admin: String?, disaster: String?): Flow<Resource<List<Disaster>>> =
+        object : NetworkBoundResource<List<Disaster>, List<GeometriesItem?>>() {
+            override fun loadFromDB(): Flow<List<Disaster>> {
+                return localDataSource.getAllDisaster(location = admin, disasterType = disaster)
+                    .map {
+                        DataMapper.mapEntitiesToDomain(it)
+                    }
+            }
+
+            override suspend fun createCall(): Flow<ApiResponse<List<GeometriesItem?>>> =
+                remoteDataSource.getAllDisaster(admin, disaster)
+
+            override suspend fun saveCallResult(data: List<GeometriesItem?>) {
+                val disasterList = DataMapper.mapResponseToEntities(data)
+                localDataSource.insertDisaster(disasterList)
+            }
+
+            override fun shouldFetch(data: List<Disaster>?): Boolean =
+                data == null || data.isEmpty()
+
+        }.asFlow()
 }
