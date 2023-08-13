@@ -4,7 +4,10 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.gg3megp0543.perify.core.utils.DarkModeEnum
+import dagger.hilt.android.HiltAndroidApp
 import java.util.*
+
+@HiltAndroidApp
 
 class PerifyApplication : Application() {
     override fun onCreate() {

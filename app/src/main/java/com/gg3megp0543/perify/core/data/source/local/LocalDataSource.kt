@@ -4,8 +4,11 @@ import com.gg3megp0543.perify.core.data.source.local.entity.DisasterEntity
 import com.gg3megp0543.perify.core.data.source.local.room.DisasterDao
 import com.gg3megp0543.perify.core.domain.model.Disaster
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class LocalDataSource private constructor(private val disasterDao: DisasterDao) {
+@Singleton
+class LocalDataSource @Inject constructor(private val disasterDao: DisasterDao) {
     companion object {
         private var instance: LocalDataSource? = null
 

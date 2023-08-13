@@ -8,12 +8,14 @@ import android.database.MatrixCursor
 import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,7 +32,6 @@ import com.gg3megp0543.perify.core.utils.ProvinceHelper
 import com.gg3megp0543.perify.notification.FloodNotificationWorker
 import com.gg3megp0543.perify.core.presenter.setting.SettingsActivity
 import com.gg3megp0543.perify.core.ui.DisasterAdapter
-import com.gg3megp0543.perify.core.ui.ViewModelFactory
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -39,15 +40,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 import java.util.*
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMainBinding
     private val boundsBuilder = LatLngBounds.Builder()
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels()
     private var isMapReady = false
     private val suggestions = ProvinceHelper.provinceMap.keys.toList()
     private var selectedProvince: String? = null
@@ -64,9 +67,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-        val factory = ViewModelFactory.getInstance(this)
-        viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
 
 //        sharedPreferences =
 //            getSharedPreferences(getString(R.string.dummy_notif_pref), Context.MODE_PRIVATE)
@@ -85,25 +85,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             adapter = disasterAdapter
         }
 
-        viewModel.getAllDisaster(location = selectedProvince, disaster = selectedDisaster)
-            .observe(this) { disaster ->
-                Log.d("cekaku", disaster.data.toString())
-                if (disaster != null) {
-                    when (disaster) {
-                        is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
-                        is Resource.Success -> {
-                            binding.progressBar.visibility = View.GONE
-                            disasterAdapter.setData(disaster.data)
-                        }
-
-                        is Resource.Error -> {
-                            binding.progressBar.visibility = View.GONE
-                            Toast.makeText(this, "Error kocak!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-            }
-
+        getAllDisaster()
 
         val columns = arrayOf("_id", "prov_name")
         val cursor = MatrixCursor(columns)
@@ -180,26 +162,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding.chipFlood.setOnClickListener {
             selectedDisaster = DisasterEnum.FLOOD.disaster
+            getAllDisaster()
         }
 
         binding.chipEarthquake.setOnClickListener {
             selectedDisaster = DisasterEnum.EARTHQUAKE.disaster
+            getAllDisaster()
         }
 
         binding.chipFire.setOnClickListener {
             selectedDisaster = DisasterEnum.FIRE.disaster
+            getAllDisaster()
         }
 
         binding.chipHaze.setOnClickListener {
             selectedDisaster = DisasterEnum.HAZE.disaster
+            getAllDisaster()
         }
 
         binding.chipWind.setOnClickListener {
             selectedDisaster = DisasterEnum.WIND.disaster
+            getAllDisaster()
         }
 
         binding.chipVolcano.setOnClickListener {
             selectedDisaster = DisasterEnum.VOLCANO.disaster
+            getAllDisaster()
         }
 
         binding.ivSetting.setOnClickListener {
@@ -225,6 +213,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             it.isHideable = false
             it.state = BottomSheetBehavior.STATE_COLLAPSED
         }
+    }
+
+    private fun getAllDisaster() {
+        viewModel.getAllDisaster(location = selectedProvince, disaster = selectedDisaster)
+            .observe(this) { disaster ->
+                Log.d("cekaku", disaster.data.toString())
+                if (disaster != null) {
+                    when (disaster) {
+                        is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
+                        is Resource.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            disasterAdapter.setData(disaster.data)
+                        }
+
+                        is Resource.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(this, "Error kocak!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
     }
 
     private fun showNotification() {
