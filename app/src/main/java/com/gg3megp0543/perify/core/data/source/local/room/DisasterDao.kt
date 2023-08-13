@@ -9,9 +9,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DisasterDao {
-    @Query("SELECT * FROM disaster WHERE (:location IS NULL OR :location = :location) AND (:disasterType IS NULL OR disaster_type = :disasterType)")
+    @Query(
+        "SELECT * FROM disaster WHERE" +
+                " (:location IS NULL OR location = :location) AND " +
+                "(:disasterType IS NULL OR disaster_type = :disasterType)"
+    )
     fun getAllDisaster(location: String?, disasterType: String?): Flow<List<DisasterEntity>>
-    
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDisaster(disaster: List<DisasterEntity>)
 }

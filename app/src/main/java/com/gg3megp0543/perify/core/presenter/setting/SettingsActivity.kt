@@ -1,7 +1,6 @@
 package com.gg3megp0543.perify.core.presenter.setting
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference

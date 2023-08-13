@@ -9,6 +9,7 @@ import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
@@ -24,6 +25,7 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.core.data.Resource
+import com.gg3megp0543.perify.core.domain.model.Disaster
 import com.gg3megp0543.perify.databinding.ActivityMainBinding
 import com.gg3megp0543.perify.core.utils.DisasterEnum
 import com.gg3megp0543.perify.core.utils.KEY_DEPTH
@@ -103,44 +105,41 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         )
         binding.svProvince.suggestionsAdapter = adapter
 
-//        binding.svProvince.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
-//            androidx.appcompat.widget.SearchView.OnQueryTextListener {
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//                binding.svProvince.clearFocus()
-//
-//                val provinceCode = ProvinceHelper.provinceMap.entries.find { (province, _) ->
-//                    province.equals(query, ignoreCase = true)
-//                }?.value
-//
-//                if (provinceCode != null) {
-//                    selectedProvince = provinceCode
-//                    viewModel.showDisasterReport(
-//                        admin = selectedProvince,
-//                        disaster = selectedDisaster
-//                    )
-//                } else {
-//                    Toast.makeText(
-//                        this@MainActivity,
-//                        R.string.unknown_province,
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//                return true
-//            }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                newText?.let {
-//                    val filteredCursor = MatrixCursor(columns)
-//                    suggestions.forEachIndexed { index, suggestion ->
-//                        if (suggestion.contains(newText, ignoreCase = true)) {
-//                            filteredCursor.addRow(arrayOf(index, suggestion))
-//                        }
-//                    }
-//                    adapter.changeCursor(filteredCursor)
-//                }
-//                return true
-//            }
-//        })
+        binding.svProvince.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                binding.svProvince.clearFocus()
+
+                val provinceCode = ProvinceHelper.provinceMap.entries.find { (province, _) ->
+                    province.equals(query, ignoreCase = true)
+                }?.value
+
+                if (provinceCode != null) {
+                    selectedProvince = provinceCode
+                    getAllDisaster()
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        R.string.unknown_province,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    val filteredCursor = MatrixCursor(columns)
+                    suggestions.forEachIndexed { index, suggestion ->
+                        if (suggestion.contains(newText, ignoreCase = true)) {
+                            filteredCursor.addRow(arrayOf(index, suggestion))
+                        }
+                    }
+                    adapter.changeCursor(filteredCursor)
+                }
+                return true
+            }
+        })
 
         binding.svProvince.setOnSuggestionListener(object : SearchView.OnSuggestionListener,
             androidx.appcompat.widget.SearchView.OnSuggestionListener {
@@ -156,6 +155,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 binding.svProvince.setQuery(selectedProv, true)
                 selectedProvince = provCode
 
+                getAllDisaster()
                 return true
             }
         })
@@ -218,18 +218,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun getAllDisaster() {
         viewModel.getAllDisaster(location = selectedProvince, disaster = selectedDisaster)
             .observe(this) { disaster ->
-                Log.d("cekaku", disaster.data.toString())
                 if (disaster != null) {
                     when (disaster) {
                         is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
                         is Resource.Success -> {
-                            binding.progressBar.visibility = View.GONE
-                            disasterAdapter.setData(disaster.data)
+                            if (disaster.data?.isEmpty() == true) {
+                                binding.progressBar.visibility = View.GONE
+                                binding.tvEmptyData.visibility = View.VISIBLE
+                                binding.rvDisaster.visibility = View.GONE
+                            } else {
+                                binding.progressBar.visibility = View.GONE
+                                binding.rvDisaster.visibility = View.VISIBLE
+                                binding.tvEmptyData.visibility = View.GONE
+                                disasterAdapter.setData(disaster.data)
+                            }
                         }
 
                         is Resource.Error -> {
                             binding.progressBar.visibility = View.GONE
-                            Toast.makeText(this, "Error kocak!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this,
+                                getString(R.string.generic_error),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
