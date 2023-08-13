@@ -1,39 +1,33 @@
 package com.gg3megp0543.perify.core.presenter.main
 
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.database.MatrixCursor
 import android.location.Geocoder
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.gg3megp0543.perify.R
 import com.gg3megp0543.perify.core.data.Resource
-import com.gg3megp0543.perify.core.domain.model.Disaster
-import com.gg3megp0543.perify.databinding.ActivityMainBinding
+import com.gg3megp0543.perify.core.presenter.setting.SettingsActivity
+import com.gg3megp0543.perify.core.ui.DisasterAdapter
 import com.gg3megp0543.perify.core.utils.DisasterEnum
 import com.gg3megp0543.perify.core.utils.KEY_DEPTH
 import com.gg3megp0543.perify.core.utils.KEY_TITLE
 import com.gg3megp0543.perify.core.utils.ProvinceHelper
+import com.gg3megp0543.perify.databinding.ActivityMainBinding
 import com.gg3megp0543.perify.notification.FloodNotificationWorker
-import com.gg3megp0543.perify.core.presenter.setting.SettingsActivity
-import com.gg3megp0543.perify.core.ui.DisasterAdapter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -53,12 +47,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMainBinding
     private val boundsBuilder = LatLngBounds.Builder()
     private val viewModel: MainViewModel by viewModels()
+    private val notifViewModel: DummyNotificationViewModel by viewModels()
     private var isMapReady = false
     private val suggestions = ProvinceHelper.provinceMap.keys.toList()
     private var selectedProvince: String? = null
     private var selectedDisaster: String? = null
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var notifViewModel: DummyNotificationViewModel
     private lateinit var disasterAdapter: DisasterAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,6 +73,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 //            notifViewModel.markNotificationAsShown()
 //        }
 
+        adapterSetup()
+        getAllDisaster()
+        searchViewSetup()
+        setupChips()
+        bottomSheetSetup()
+        settingActivitySetup()
+    }
+
+    private fun adapterSetup() {
         disasterAdapter = DisasterAdapter()
 
         with(binding.rvDisaster) {
@@ -87,8 +90,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             adapter = disasterAdapter
         }
 
-        getAllDisaster()
+        binding.rvDisaster.layoutManager = LinearLayoutManager(this)
+    }
 
+    private fun searchViewSetup() {
         val columns = arrayOf("_id", "prov_name")
         val cursor = MatrixCursor(columns)
         suggestions.forEachIndexed { index, suggestion ->
@@ -159,60 +164,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 return true
             }
         })
-
-        binding.chipFlood.setOnClickListener {
-            selectedDisaster = DisasterEnum.FLOOD.disaster
-            getAllDisaster()
-        }
-
-        binding.chipEarthquake.setOnClickListener {
-            selectedDisaster = DisasterEnum.EARTHQUAKE.disaster
-            getAllDisaster()
-        }
-
-        binding.chipFire.setOnClickListener {
-            selectedDisaster = DisasterEnum.FIRE.disaster
-            getAllDisaster()
-        }
-
-        binding.chipHaze.setOnClickListener {
-            selectedDisaster = DisasterEnum.HAZE.disaster
-            getAllDisaster()
-        }
-
-        binding.chipWind.setOnClickListener {
-            selectedDisaster = DisasterEnum.WIND.disaster
-            getAllDisaster()
-        }
-
-        binding.chipVolcano.setOnClickListener {
-            selectedDisaster = DisasterEnum.VOLCANO.disaster
-            getAllDisaster()
-        }
-
-        binding.ivSetting.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-
-
-//        viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
-//            propertiesWithCoordinates?.let {
-//                setData(it)
-//
-//                if (isMapReady) {
-//                    locationMarker()
-//                }
-//            }
-//        }
-
-        binding.rvDisaster.layoutManager = LinearLayoutManager(this)
-
-        val disasterBottomSheet = findViewById<FrameLayout>(R.id.bottom_sheet)
-        val disasterBottomSheetBehavior = BottomSheetBehavior.from(disasterBottomSheet)
-        disasterBottomSheetBehavior.let {
-            it.isHideable = false
-            it.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
     }
 
     private fun getAllDisaster() {
@@ -226,7 +177,43 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                                 binding.progressBar.visibility = View.GONE
                                 binding.tvEmptyData.visibility = View.VISIBLE
                                 binding.rvDisaster.visibility = View.GONE
+                                mMap.clear()
                             } else {
+                                mMap.clear()
+                                disaster.data?.forEach {
+
+                                    val marker = mMap.addMarker(
+                                        MarkerOptions().position(
+                                            LatLng(
+                                                it.latitude!!,
+                                                it.longitude!!
+                                            )
+                                        ).title(it.disasterType).snippet(
+                                            getAddressName(
+                                                it.latitude,
+                                                it.longitude
+                                            )
+                                        )
+                                    )
+
+                                    marker?.let { it1 ->
+                                        boundsBuilder.include(
+                                            it1.position
+                                        )
+                                    }
+
+                                    val bounds: LatLngBounds = boundsBuilder.build()
+
+                                    mMap.animateCamera(
+                                        CameraUpdateFactory.newLatLngBounds(
+                                            bounds,
+                                            resources.displayMetrics.widthPixels,
+                                            resources.displayMetrics.heightPixels,
+                                            300
+                                        )
+                                    )
+                                }
+
                                 binding.progressBar.visibility = View.GONE
                                 binding.rvDisaster.visibility = View.VISIBLE
                                 binding.tvEmptyData.visibility = View.GONE
@@ -247,6 +234,55 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
     }
 
+    private fun setupChips() {
+        with(binding) {
+            chipFlood.setOnClickListener {
+                selectedDisaster = DisasterEnum.FLOOD.disaster
+                getAllDisaster()
+            }
+
+            chipEarthquake.setOnClickListener {
+                selectedDisaster = DisasterEnum.EARTHQUAKE.disaster
+                getAllDisaster()
+            }
+
+            chipFire.setOnClickListener {
+                selectedDisaster = DisasterEnum.FIRE.disaster
+                getAllDisaster()
+            }
+
+            chipHaze.setOnClickListener {
+                selectedDisaster = DisasterEnum.HAZE.disaster
+                getAllDisaster()
+            }
+
+            chipWind.setOnClickListener {
+                selectedDisaster = DisasterEnum.WIND.disaster
+                getAllDisaster()
+            }
+
+            chipVolcano.setOnClickListener {
+                selectedDisaster = DisasterEnum.VOLCANO.disaster
+                getAllDisaster()
+            }
+        }
+    }
+
+    private fun bottomSheetSetup() {
+        val disasterBottomSheet = findViewById<FrameLayout>(R.id.bottom_sheet)
+        val disasterBottomSheetBehavior = BottomSheetBehavior.from(disasterBottomSheet)
+        disasterBottomSheetBehavior.let {
+            it.isHideable = false
+            it.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
+    private fun settingActivitySetup() {
+        binding.ivSetting.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+    }
+
     private fun showNotification() {
         val notificationWorkRequest =
             OneTimeWorkRequest.Builder(FloodNotificationWorker::class.java)
@@ -261,20 +297,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         WorkManager.getInstance(this).enqueue(notificationWorkRequest)
     }
 
-//    private fun setData(propertiesWithCoordinates: List<Pair<Properties, List<Any?>>>) {
-//        val adapter = DisasterAdapter()
-//        adapter.submitList(propertiesWithCoordinates.map { it.first })
-//
-//        if (propertiesWithCoordinates.isNotEmpty()) {
-//            binding.rvDisaster.visibility = View.VISIBLE
-//            binding.tvEmptyData.visibility = View.GONE
-//            binding.rvDisaster.adapter = adapter
-//        } else {
-//            binding.rvDisaster.visibility = View.GONE
-//            binding.tvEmptyData.visibility = View.VISIBLE
-//        }
-//    }
-
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         isMapReady = true
@@ -284,73 +306,48 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             it.uiSettings.isCompassEnabled = true
         }
 
-//        getMyLocation()
-//        locationMarker()
+//        mMap.setOnMarkerClickListener { marker ->
+//            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker.position, 16F)
+//            mMap.animateCamera(cameraUpdate)
+//            true
+//        }
+
+        getMyLocation()
     }
-//
-//    private val requestPermissionLauncher = registerForActivityResult(
-//        ActivityResultContracts.RequestPermission()
-//    ) { permitted: Boolean ->
-//        if (permitted) {
-//            getMyLocation()
-//        }
-//    }
-//
-//    private fun getMyLocation() {
-//        if (ContextCompat.checkSelfPermission(
-//                this.applicationContext,
-//                android.Manifest.permission.ACCESS_FINE_LOCATION
-//            ) == PackageManager.PERMISSION_GRANTED
-//        ) {
-//            mMap.isMyLocationEnabled = true
-//        } else {
-//            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-//        }
-//    }
-//
-//    private fun locationMarker() {
-//        mMap.clear()
-//
-//        viewModel.propertiesWithCoordinates.observe(this) { propertiesWithCoordinates ->
-//            propertiesWithCoordinates?.forEach { (properties, coordinates) ->
-//                if (coordinates.size >= 2) {
-//                    val latLng = LatLng(coordinates[1] as Double, coordinates[0] as Double)
-//                    val addressName =
-//                        getAddressName(coordinates[1] as Double, coordinates[0] as Double)
-//                    mMap.addMarker(
-//                        MarkerOptions().position(latLng).title(properties.disasterType)
-//                            .snippet(addressName)
-//                    )
-//                    boundsBuilder.include(latLng)
-//                }
-//            }
-//
-//            if (propertiesWithCoordinates?.isNotEmpty() == true) {
-//                val bounds: LatLngBounds = boundsBuilder.build()
-//                mMap.animateCamera(
-//                    CameraUpdateFactory.newLatLngBounds(
-//                        bounds,
-//                        resources.displayMetrics.widthPixels,
-//                        resources.displayMetrics.heightPixels,
-//                        300
-//                    )
-//                )
-//            }
-//        }
-//    }
-//
-//    @Suppress("DEPRECATION")
-//    private fun getAddressName(lat: Double, lon: Double): String? {
-//        var addressName: String? = null
-//        val geocoder = Geocoder(this@MainActivity, Locale.getDefault())
-//        try {
-//            val list = geocoder.getFromLocation(lat, lon, 1)
-//            if (list != null && list.size != 0) {
-//                addressName = list[0].getAddressLine(0)
-//            }
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//        }
-//        return addressName
-//    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { permitted: Boolean ->
+        if (permitted) {
+            getMyLocation()
+        }
+    }
+
+    private fun getMyLocation() {
+        if (ContextCompat.checkSelfPermission(
+                this.applicationContext,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            mMap.isMyLocationEnabled = true
+        } else {
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun getAddressName(lat: Double, lon: Double): String? {
+        var addressName: String? = null
+        val geocoder = Geocoder(this, Locale.getDefault())
+        try {
+            val list = geocoder.getFromLocation(lat, lon, 1)
+            if (list != null && list.size != 0) {
+                addressName = list[0].getAddressLine(0)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return addressName
+    }
 }
+
