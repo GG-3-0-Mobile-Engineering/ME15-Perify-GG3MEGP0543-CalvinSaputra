@@ -19,7 +19,7 @@
         android:theme="@style/Theme.Perify"
         tools:targetApi="31">
         <activity
-            android:name=".ui.setting.SettingsActivity"
+            android:name=".core.presenter.setting.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings">
             <meta-data
@@ -29,10 +29,10 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAO5nl3QgBpKEQWlaU094Dfwu6xf1cGjMg" />
+            android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".core.presenter.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
