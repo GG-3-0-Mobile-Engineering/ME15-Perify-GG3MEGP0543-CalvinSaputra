@@ -18,18 +18,6 @@ class DisasterRepository @Inject constructor(
     private val localDataSource: LocalDataSource,
 ) : IDisasterRepository {
 
-    companion object {
-        @Volatile
-        private var instance: DisasterRepository? = null
-        fun getInstance(
-            remoteData: RemoteDataSource,
-            localData: LocalDataSource,
-        ): DisasterRepository =
-            instance ?: synchronized(this) {
-                instance ?: DisasterRepository(remoteData, localData)
-            }
-    }
-
     override fun getAllDisaster(admin: String?, disaster: String?): Flow<Resource<List<Disaster>>> =
         object : NetworkBoundResource<List<Disaster>, List<GeometriesItem?>>() {
             override fun loadFromDB(): Flow<List<Disaster>> {
@@ -48,7 +36,7 @@ class DisasterRepository @Inject constructor(
             }
 
             override fun shouldFetch(data: List<Disaster>?): Boolean =
-                data == null || data.isEmpty()
+                data.isNullOrEmpty()
 
         }.asFlow()
 }

@@ -1,9 +1,6 @@
 package com.gg3megp0543.perify.core.di
 
-import com.gg3megp0543.perify.core.data.DisasterRepository
 import com.gg3megp0543.perify.core.data.source.remote.network.ApiService
-import com.gg3megp0543.perify.core.domain.repository.IDisasterRepository
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +9,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.annotation.concurrent.Immutable
 
 @Module
 @InstallIn(SingletonComponent::class)

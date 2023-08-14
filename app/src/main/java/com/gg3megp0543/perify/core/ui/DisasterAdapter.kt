@@ -69,7 +69,8 @@ class DisasterAdapter :
             )
 
             Glide.with(binding.root.context)
-                .load(data.imageUrl ?: R.drawable.empty_placeholder)
+                .load(if (data.imageUrl == "null") null else data.imageUrl)
+                .placeholder(R.drawable.empty_placeholder)
                 .into(binding.ivDisasaterPhoto)
         }
     }

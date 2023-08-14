@@ -2,7 +2,7 @@ package com.gg3megp0543.perify.core.utils
 
 class CodeProvinceHelper {
     companion object {
-        val codeProvinceMap = mapOf(
+        private val codeProvinceMap = mapOf(
             "ID-AC" to "Aceh",
             "ID-BA" to "Bali",
             "ID-BB" to "Bangka Belitung",
