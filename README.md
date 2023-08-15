@@ -87,6 +87,9 @@ A: It works but it's still a dummy data, because the endpoint always return an e
 #### Q: Why the maps is not showing when i build the apps?
  A: Please create your own Google Maps API Key then head to the local.properties in the project file. Create a variable called "MAPS_API_KEY" and fill it with your created API Key.
 
+#### Question 3
+#### Q: Why there's no Unit Test, even though the commit indicate it?
+ A: The Unit Test is not yet be created, i make a mistake on the commit name. It should be "Adding UI Test" instead of "Adding Unit Test".
 
 ## Feedback
 If you have any feedback, please reach out to my email at calvinsaputra217@gmail.com.
