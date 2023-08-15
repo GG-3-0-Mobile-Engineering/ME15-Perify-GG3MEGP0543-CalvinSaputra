@@ -39,7 +39,7 @@ MAPS_API_KEY=YourAPIKey
 
 ## Demo
 
-[Perify.apk](https://drive.google.com/file/d/1OqnxiXGyu8vumbZeZyE17eNAalXUz2uV/view?usp=sharing)
+[Perify.apk](https://drive.google.com/file/d/1Csau5jMVE9E6Fx-Zq_UA8Dc_kYH1Camo/view?usp=drive_link)
 
 [Application Demo / Youtube](https://youtu.be/SajvR25oEws)
 
@@ -59,9 +59,22 @@ MAPS_API_KEY=YourAPIKey
 | `admin` | `string` | **Optional** - Filtering based on Province. |
 
 
+## Test Cases
+#### Unit Test
+As for now, the Unit Test is not yet implemented
+#### UI Test
+Below are the test cases that've been implemented on Perify. For details on UI Test please check this [video](https://www.youtube.com/watch?v=ul3sMuP_0so).
+- Load data and show it onto the RecyclerView (PASSED).
+- Load disaster data based on Disaster Type (PASSED).
+- Load disaster data based on Province (PASSED).
+- Load disaster data based on Disaster Type and Province (PASSED).
+- Show message when the data is empty (PASSED).
+- Navigating to SettingsActivity to enable Dark mode (PASSED).
+- Check whether the Dark Mode is active (PASSED).
+
 ## Roadmap
 - Enhance the UI part
-- Implement more testing case
+- Implement more testing case (especially Unit Test)
 - Add more features
 
 
