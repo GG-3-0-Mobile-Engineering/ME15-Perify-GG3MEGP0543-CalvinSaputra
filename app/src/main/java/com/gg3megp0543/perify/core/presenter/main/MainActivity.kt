@@ -1,5 +1,6 @@
 package com.gg3megp0543.perify.core.presenter.main
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -64,14 +65,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-//        sharedPreferences =
-//            getSharedPreferences(getString(R.string.dummy_notif_pref), Context.MODE_PRIVATE)
-//        notifViewModel = ViewModelProvider(this)[DummyNotificationViewModel::class.java]
-//
-//        if (!notifViewModel.isNotificationShown) {
-//            showNotification()
-//            notifViewModel.markNotificationAsShown()
-//        }
+        sharedPreferences =
+            getSharedPreferences(getString(R.string.dummy_notif_pref), Context.MODE_PRIVATE)
+
+        if (!notifViewModel.isNotificationShown) {
+            showNotification()
+            notifViewModel.markNotificationAsShown()
+        }
 
         adapterSetup()
         getAllDisaster()
@@ -305,12 +305,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             it.uiSettings.isIndoorLevelPickerEnabled = true
             it.uiSettings.isCompassEnabled = true
         }
-
-//        mMap.setOnMarkerClickListener { marker ->
-//            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker.position, 16F)
-//            mMap.animateCamera(cameraUpdate)
-//            true
-//        }
 
         getMyLocation()
     }

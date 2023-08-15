@@ -23,7 +23,7 @@
 
     <!-- Preferences -->
     <string name="setting_header">Setting</string>
-    <string name="pref_dark_title">Dark mode</string>
+    <string name="pref_theme_title">Theme</string>
     <string name="pref_key_dark" translatable="false">key_dark_mode</string>
     <string name="pref_dark_follow_system" translatable="false">follow_system</string>
     <string name="pref_dark_on" translatable="false">on</string>
